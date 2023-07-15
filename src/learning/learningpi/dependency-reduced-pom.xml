@@ -167,7 +167,7 @@
   </build>
   <properties>
     <maven.compiler.source>11</maven.compiler.source>
-    <pi4j.version>2.1.0</pi4j.version>
+    <pi4j.version>2.3.0</pi4j.version>
     <target.platform.name>raspberry</target.platform.name>
     <maven.compiler.target>11</maven.compiler.target>
     <slf4j.version>1.7.32</slf4j.version>

@@ -9,17 +9,29 @@ import com.pi4j.Pi4J;
 import com.pi4j.context.Context;
 import com.pi4j.io.gpio.digital.DigitalOutput;
 import com.pi4j.io.gpio.digital.DigitalState;
+import com.pi4j.io.pwm.Pwm;
+import com.pi4j.io.pwm.PwmType;
 import com.pi4j.platform.Platforms;
 import com.pi4j.util.Console;
 import java.lang.reflect.InvocationTargetException;
 
 /**
  *
- * @author luca
+ * @author luca (base), Marcel
  */
 public class Main {
 
-    private static final int PIN_LED = 22; // PIN 15 = BCM 22
+    //Motors de l'esquerre
+    private static final int m1 = 20; // PIN 38 = BCM 20
+    private static final int m2 = 21; // PIN 40 = BCM 21
+    private static final int PWMA = 26; // PIN 37 = BCM 26
+    //Motors de la dreta
+    private static final int m3 = 6; // PIN 31 = BCM 6
+    private static final int m4 = 13; // PIN 33 = BCM 13
+    private static final int PWMB = 12; // PIN 32 = BCM 12
+    
+    
+    
     private static final Console console = new Console();
 
     /**
@@ -60,56 +72,165 @@ public class Main {
         console.println();
         platforms.describe().print(System.out);
         console.println();
-
-        var ledConfig = DigitalOutput.newConfigBuilder(pi4j)
-                        .id("led")
-                        .name("LED Flasher")
-                        .address(PIN_LED)
+        
+        //Configuració pins
+        var m1Config = DigitalOutput.newConfigBuilder(pi4j)
+                        .id("m1")
+                        .name("Motor 1 state 1")
+                        .address(m1)
                         .shutdown(DigitalState.LOW)
                         .initial(DigitalState.LOW)
                         .provider("pigpio-digital-output");
+        var m2Config = DigitalOutput.newConfigBuilder(pi4j)
+                        .id("m2")
+                        .name("Motor 1 state 2")
+                        .address(m2)
+                        .shutdown(DigitalState.LOW)
+                        .initial(DigitalState.LOW)
+                        .provider("pigpio-digital-output");
+        var m3Config = DigitalOutput.newConfigBuilder(pi4j)
+                        .id("m3")
+                        .name("Motor 2 state 1")
+                        .address(m3)
+                        .shutdown(DigitalState.LOW)
+                        .initial(DigitalState.LOW)
+                        .provider("pigpio-digital-output");
+        var m4Config = DigitalOutput.newConfigBuilder(pi4j)
+                        .id("m4")
+                        .name("Motor 2 state 2")
+                        .address(m4)
+                        .shutdown(DigitalState.LOW)
+                        .initial(DigitalState.LOW)
+                        .provider("pigpio-digital-output");
+        
+        //Els pins amb "Pulse Width Modulation tenen una configuració diferent
+        var PWMAConfig = Pwm.newConfigBuilder(pi4j)
+                        .id("PWMA")
+                        .name("Speed Motor 1")
+                        .address(PWMA)
+                        .pwmType(PwmType.SOFTWARE)
+                        .shutdown(0)
+                        .initial(0)
+                        .provider("pigpio-pwm");
+        var PWMBConfig = Pwm.newConfigBuilder(pi4j)
+                        .id("PWMB")
+                        .name("Speed Motor 2")
+                        .address(PWMB)
+                        .pwmType(PwmType.HARDWARE)
+                        .shutdown(0)
+                        .initial(0)
+                        .provider("pigpio-pwm");
+        
 
-        var led = pi4j.create(ledConfig);
-        //int counter = 0;
+        //Creem els objectes dels pins
+        var them1 = pi4j.create(m1Config);
+        var them2 = pi4j.create(m2Config);
+        var them3 = pi4j.create(m3Config);
+        var them4 = pi4j.create(m4Config);
+        var thePWMA = pi4j.create(PWMAConfig);
+        var thePWMB = pi4j.create(PWMBConfig);
+        
+        //La freqüència per defecte és de 500Hz 
+        thePWMA.on(25, 500);
+        thePWMB.on(25, 500);
+        
+        //LA duració del cicle per defecte és de 50%
+        
+        //Funcions
+        class Movement {
+            void reverse() {
+                them1.low();
+                them2.high();
+                them3.low();
+                them4.high();
+                console.println("Reverse", this);
+            }
+            void forward() {
+                them1.high();
+                them2.low();
+                them3.high();
+                them4.low();
+                console.println("Forward", this);
+            }
+            void left() {
+                them1.high();
+                them2.low();
+                them3.low();
+                them4.high();
+                console.println("Left", this);
+            }
+            void right() {
+                them1.low();
+                them2.high();
+                them3.high();
+                them4.low();
+                console.println("Right", this);
+            }
+            void stop() {
+                them1.low();
+                them2.low();
+                them3.low();
+                them4.low();
+                console.println("Stop", this);
+            }
+            void speed(Number speed) {
+              thePWMA.on(speed, 500);
+              thePWMB.on(speed, 500);
+            }
+        }
         
         
+        
+        Movement move = new Movement();
         Input reader = new Input("Reader");
         reader.start();
 
+        int imSpeed;
         boolean working = true;
-        //while(counter <= 50 {
         while (working) {
             
-            /*if (led.equals(DigitalState.HIGH)) {
-                led.low();
-                System.out.println("low");
-            } else {
-                led.high();
-                System.out.println("high");
-            }*/
-            //Thread.sleep((long) (500.0 * timing)); //Modifquem freqüencia
-            //counter++;
-            while(Resource.word.equals("")) {}
+            
+            while(Resource.word.equals("")) {} //Esperem a que s'introdueixi alguna cosa
             switch(Resource.word.toLowerCase()) {
-                case "down":
-                    led.low();
-                    console.println("Led OFF");
+                case "reverse":
+                    move.reverse();
                     break;
-                case "up":
-                    led.high();
-                    console.println("Led ON");
+                case "forward":
+                    move.forward();
+                    break;
+                case "left":
+                    move.left();
+                    break;
+                case "right":
+                    move.right();
+                    break;
+                case "stop":
+                    move.stop();
+                    break;
+                case "speed":
+                    Resource.canExit = false;
+                    System.out.print("What speed (%)? (0 - 100): ");
+                    Resource.word = ""; 
+                    while(Resource.word.equals("")) {}
+                    imSpeed = Integer.parseInt(Resource.word);
+                    move.speed(imSpeed);
                     break;
                 case "quit":
-                    led.low();
-                    console.println("Exiting program now");
+                    move.stop();
+                    console.println("Exiting program now", this);
                     working = false;
                     break;
                 default:
-                    console.println("Not reconized, don't do anything");
+                    console.println("Not reconized, don't do anything", this);
                     break;
             }
             Resource.word = "";
+            Resource.canExit = true;
+            
         }
     }
-
+    
+    
+    
+                
 }

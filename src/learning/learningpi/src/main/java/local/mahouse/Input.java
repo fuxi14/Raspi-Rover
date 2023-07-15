@@ -37,9 +37,13 @@ public class Input extends Thread{
         while(working) {
             
             word = input.nextLine();
-            Resource.word = word;
-            //console.println("Introduced word: %s\n", word);
-            //classe compartida
+            if(Resource.word.equalsIgnoreCase("quit") && !Resource.canExit) {
+                console.println("Error: Exit is not allowed now, please complete task before exit is allowed", this);
+            }else{
+                Resource.word = word;
+                //console.println("Introduced word: %s\n", word);
+                
+            }
             if(Resource.word.equalsIgnoreCase("quit")) {
                 working = false;
             }
