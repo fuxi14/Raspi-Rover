@@ -64,6 +64,14 @@ public class Main {
             }
         }
     }
+    
+    /*
+     * El codi per controlar la placa controladora ha sigut adaptat del codi
+     * d'exemple que ofereix l'empresa que l'ha creat.
+     *
+     * https://www.waveshare.com/w/upload/9/96/RPi-Motor-Driver-Board-Demo-Code.tar.gz
+     */
+    
     //Afegim un argument per controlar la duració del parpalleig
     private void run(Context pi4j) throws Exception { //float timing is no longer needed
         Platforms platforms = pi4j.platforms();
