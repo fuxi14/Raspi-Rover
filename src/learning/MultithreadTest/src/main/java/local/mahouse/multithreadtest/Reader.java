@@ -3,7 +3,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package local.mahouse.multithreadtest;
-import java.util.Arrays;
 import java.util.Scanner;
 
 /**

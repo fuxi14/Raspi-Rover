@@ -25,6 +25,8 @@ public class Client {
         ObjectInputStream ois = null;
         boolean work = true;
         String srvResp;
+        Reader reader = null;
+
         
         while(work) {
             //Inicialitzem connecció
@@ -32,8 +34,11 @@ public class Client {
             socket = new Socket(host.getHostName(), 9876);
             
             //Esperem a que s'escrigui alguna cosa
-            Reader reader = new Reader("Reader");
-            reader.start();
+            if(reader == null) {
+                reader = new Reader("Reader");
+                reader.start();
+            }
+
             while(Resource.word.equals("")) {}
             
             System.out.println("[Client] Sending value of \"" + Resource.word + "\" to Server");
