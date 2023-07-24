@@ -1,3 +1,5 @@
+local/mahouse/multithreadtest/Client.class
+local/mahouse/multithreadtest/Server.class
 local/mahouse/multithreadtest/MultithreadTest.class
 local/mahouse/multithreadtest/Reader.class
 local/mahouse/multithreadtest/Resource.class

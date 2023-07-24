@@ -37,7 +37,7 @@ public class Reader extends Thread{
             Resource.word = word;
             //System.out.printf("[%s] Introduced word: %s\n", threadName, word);
             //classe compartida
-            if(Resource.word.equalsIgnoreCase("quit")) {
+            if(Resource.word.equalsIgnoreCase("exit")) {
                 working = false;
             }
             

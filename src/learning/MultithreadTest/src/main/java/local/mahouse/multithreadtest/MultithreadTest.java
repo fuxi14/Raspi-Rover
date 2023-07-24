@@ -4,34 +4,37 @@
 
 package local.mahouse.multithreadtest;
 
+import java.io.IOException;
+import java.net.UnknownHostException;
+
 /**
  *
  * @author nuria
  */
 public class MultithreadTest {
 
-    public static void main(String[] args) {
-        //Let's rock!
-        
-        //Iniciem la classe amb la paraula de buffer
-        Resource buffer = new Resource();
-        //Iniciem lector
-        Reader reader = new Reader("Reader");
-        reader.start();
-        
-        boolean work = true;
-        
-        while(work) {
-            while(Resource.word.equals("")) {}
-            if(Resource.word.equalsIgnoreCase("quit")) {
-                    System.out.println("Surt del programa");
-                    work = false;
-            }else{        
-                System.out.println("S'ha introduiut la paraula: " + Resource.word);
-                Resource.word = "";
-                    
+    public static void main(String[] args) throws IOException, ClassNotFoundException, UnknownHostException, InterruptedException {
+        String usage = "Usage: java -jar MultithreadTest.jar [OPTION] [IP ADDRESS]\n"
+                    + "[Option]:\n"
+                    + "Server   Initialize progam as server\n"
+                    + "Client   Initialize program as client, requires server IP address";
+        if(args.length == 0) {
+            System.out.println("Error: No arguments passed\n" + usage);
+        }else{
+            switch(args[0].toLowerCase()) {
+                case "server":
+                    Server server = new Server();
+                    server.run();
+                    break;
+                case "client":
+                    Client client = new Client();
+                    client.run(args[1]);
+                    break;
+                default:
+                    System.out.println("Error, Bad Syntax:" + usage);
+                    break;
             }
         }
-        
+    
     }
 }
