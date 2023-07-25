@@ -28,4 +28,5 @@ public class Resource {
   }*/
     
     public static volatile String word = "";
+    public static volatile boolean canRetry = true;
 }

@@ -1,7 +1,7 @@
 package local.mahouse.rovercontroller;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -17,6 +17,12 @@ import androidx.navigation.ui.NavigationUI;
 
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
+
+import java.io.IOException;
+import java.net.ConnectException;
+import java.net.NoRouteToHostException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import local.mahouse.rovercontroller.ui.home.HomeFragment;
 
@@ -74,15 +80,60 @@ public class MainActivity extends AppCompatActivity {
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
         switch (item.getItemId()) {
             case R.id.action_con_dis:
-                Singleton.connect(getWindow().getDecorView(), HomeFragment.getIPText());
 
-
+                String addr = HomeFragment.getIPText(); //Un fil separat no pot tocar les vistes d'un altre fil (main)
+                AtomicBoolean failed = new AtomicBoolean(false);
+                //Spaguetti code!!!
                 if(Singleton.isConnected() == false) {
-                    item.setTitle(getText(R.string.connect_button));
+
+                    //Correm el codi que controla la xarxa en un fil separat
+                    new Thread(() -> {
+                        try {
+                            Singleton.connect(addr); //Provem de connectar
+                        } catch (NoRouteToHostException e) {
+                            failed.set(true);
+                            runOnUiThread(() -> //Run toast on (main) thread
+                                    Toast.makeText(this, getText(R.string.error_NoRouteToHostException), Toast.LENGTH_LONG).show());
+                        } catch (ConnectException e) {
+                            failed.set(true);
+                            runOnUiThread(() -> //So we can create a toast notification
+                                    Toast.makeText(this, getText(R.string.error_ConnectException), Toast.LENGTH_LONG).show());
+
+
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }).start();
+                    //If we don't fail to connect
+                    if (failed.get() == false) {
+                        item.setTitle(R.string.disconnect_button);
+                        Snackbar.make(getWindow().getDecorView(), getText(R.string.connected) + addr,
+                                Snackbar.LENGTH_LONG).show();
+                    }else{
+                        Singleton.setConnected(false);
+                    }
+
                 }else{
-                    item.setTitle(getText(R.string.disconnect_button));
+                    item.setTitle(R.string.connect_button);
+                    try {
+                        //Correm el codi que controla la xarxa en un fil separat
+                        new Thread(() -> {
+                            try {
+                                Singleton.disconnect();
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }).start();
+                        Snackbar.make(getWindow().getDecorView(), getText(R.string.disconnected),
+                                Snackbar.LENGTH_LONG).show();
+                    } catch (Exception e) {
+                        //throw new RuntimeException(e);
+                        Snackbar.make(getParent().getCurrentFocus(), getText(R.string.error_IOException), BaseTransientBottomBar.LENGTH_LONG)
+                                .show();
+                    }
 
                 }
                 return true;
@@ -90,5 +141,6 @@ public class MainActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
 
 }

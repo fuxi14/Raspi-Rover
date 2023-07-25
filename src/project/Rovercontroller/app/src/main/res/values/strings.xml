@@ -16,4 +16,12 @@
     <string name="connect_info">To connect to the server use button in top right menu</string>
     <string name="send_button">Send</string>
     <string name="enter_message_hint">Message</string>
+    <string name="error_IOException">Error while connecting to server: IOException</string>
+    <string name="error_ClassNotFound">Error while connecting to server: ClassNotFound</string>
+    <string name="error_InterruptedException">Error while connecting to server: InterruptedException</string>
+    <string name="try_again">Try again</string>
+    <string name="connected">Connected to server:</string>
+    <string name="disconnected">Successfully disconnected from server</string>
+    <string name="error_NoRouteToHostException">Error: NoRouteToHostException. Perhaps IP is incorrect or port 9876 is closed on server firewall?</string>
+    <string name="error_ConnectException">Error: Conection was refused. Perhaps server software is not running?</string>
 </resources>

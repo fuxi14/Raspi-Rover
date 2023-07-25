@@ -4,10 +4,14 @@ import android.content.Context;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.ConnectException;
 import java.net.InetAddress;
+import java.net.NoRouteToHostException;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 public class Singleton {
 
@@ -31,17 +35,25 @@ public class Singleton {
         return connected;
     }
 
-    public static void connect(View view, String addr) {
-        Snackbar.make(view, "IP Address inserted is: " + addr,
-                        Snackbar.LENGTH_LONG)
-                //.setAction("Action", null)
-                .show();
+    public static void setConnected(boolean connected) {
+        Singleton.connected = connected;
+    }
 
-        if(connected == false) {
-            connected = true;
-        }else{
-            connected = false;
-        }
+    public static void connect(String addr) throws NoRouteToHostException, ConnectException,IOException {
+        //Connectem amb el server
+
+        host = InetAddress.getByName(addr);
+        socket = new Socket(host.getHostName(), 9876);
+        oos = new ObjectOutputStream(socket.getOutputStream());
+        ois = new ObjectInputStream(socket.getInputStream());
+        connected = true;
+
+    }
+    public static void disconnect() throws IOException {
+        oos.close();
+        ois.close();
+        socket.close();
+        connected = false;
 
     }
 }

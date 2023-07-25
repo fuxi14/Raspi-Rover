@@ -4,8 +4,12 @@
 
 package local.mahouse.multithreadtest;
 
+import java.io.EOFException;
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -13,7 +17,7 @@ import java.net.UnknownHostException;
  */
 public class MultithreadTest {
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException, UnknownHostException, InterruptedException {
+    public static void main(String[] args) {
         String usage = "Usage: java -jar MultithreadTest.jar [OPTION] [IP ADDRESS]\n"
                     + "[Option]:\n"
                     + "Server   Initialize progam as server\n"
@@ -24,12 +28,34 @@ public class MultithreadTest {
             switch(args[0].toLowerCase()) {
                 case "server":
                     Server server = new Server();
-                    server.run();
+                    while(Resource.canRetry) {
+                        Resource.canRetry = false;
+                        try {
+                            server.run();
+                        } catch (IOException ex) {
+                            Logger.getLogger(MultithreadTest.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (ClassNotFoundException ex) {
+                            Logger.getLogger(MultithreadTest.class.getName()).log(Level.SEVERE, null, ex);
+
+                        }
+                    }
                     break;
+
                 case "client":
                     Client client = new Client();
-                    client.run(args[1]);
+                {
+                    try {
+                        client.run(args[1]);
+                    } catch (IOException ex) {
+                        Logger.getLogger(MultithreadTest.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (ClassNotFoundException ex) {
+                        Logger.getLogger(MultithreadTest.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(MultithreadTest.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
                     break;
+
                 default:
                     System.out.println("Error, Bad Syntax:" + usage);
                     break;

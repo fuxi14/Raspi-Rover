@@ -27,12 +27,18 @@ public class Client {
         String srvResp;
         Reader reader = null;
 
+        System.out.println("[Client] Atempting to connect to server...");
+        socket = new Socket(host.getHostName(), 9876);
+        System.out.println("[Client] Connected to server...");
+        
+        oos = new ObjectOutputStream(socket.getOutputStream());
+        System.out.println("[Client] Initialized oos...");
+        ois = new ObjectInputStream(socket.getInputStream());
+        System.out.println("[Client] Initialized ois...");
         
         while(work) {
             //Inicialitzem connecció
-            System.out.println("[Client] Atempting to connect to server...");
-            socket = new Socket(host.getHostName(), 9876);
-            
+            System.out.println("[Client] In work loop");
             //Esperem a que s'escrigui alguna cosa
             if(reader == null) {
                 reader = new Reader("Reader");
@@ -43,11 +49,9 @@ public class Client {
             
             System.out.println("[Client] Sending value of \"" + Resource.word + "\" to Server");
             //Enviem dades al server
-            oos = new ObjectOutputStream(socket.getOutputStream());
             oos.writeObject(Resource.word);
             
             //Esperem resposta del server
-            ois = new ObjectInputStream(socket.getInputStream());
             srvResp = ois.readObject().toString();
             System.out.println("[Client] Server response was: " + srvResp);
             
@@ -60,9 +64,12 @@ public class Client {
             
             
             Resource.word = "";
-            socket.close();
-            oos.close();
-            ois.close();
+            
+
         }
+        socket.close();
+        oos.close();
+        ois.close();
     }
+    
 }
