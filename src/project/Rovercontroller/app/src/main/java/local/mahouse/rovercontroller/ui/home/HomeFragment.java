@@ -13,11 +13,11 @@ import android.support.v4.app.Fragment;
 import android.arch.lifecycle.ViewModelProvider;
 
 import local.mahouse.rovercontroller.R;
+import local.mahouse.rovercontroller.Singleton;
 
 public class HomeFragment extends Fragment {
 
-    boolean connected = false;
-
+    static EditText enterIP = null;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -25,27 +25,11 @@ public class HomeFragment extends Fragment {
 
 
         //Inicialitzem les vistes
-        final EditText enterIP = homeFragment.findViewById(R.id.editTextIPAddress);
-        final Button btnConDis = homeFragment.findViewById(R.id.btnConDis);
+        enterIP = homeFragment.findViewById(R.id.editTextIPAddress);
+
 
         //Escoltem si es clica el botó i fem acció
-        btnConDis.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "IP Address inserted is: " + enterIP.getText().toString(),
-                                Snackbar.LENGTH_LONG)
-                        //.setAction("Action", null)
-                        .show();
 
-                if(connected == false) {
-                    btnConDis.setText(getText(R.string.disconnect_button));
-                    connected = true;
-                }else{
-                    btnConDis.setText(getText(R.string.connect_button));
-                    connected = false;
-                }
-            }
-        });
 
        /*
         * Resulta que l'error:
@@ -54,6 +38,10 @@ public class HomeFragment extends Fragment {
         * inicialitzar qualsevol vista fallava perquè aquesta no existia :)
         * */
         return homeFragment; //You f*ucking idiot
+    }
+
+    public static String getIPText() {
+        return enterIP.getText().toString();
     }
 
     @Override
