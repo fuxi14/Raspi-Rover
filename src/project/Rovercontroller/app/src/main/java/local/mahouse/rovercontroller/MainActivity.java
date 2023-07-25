@@ -1,6 +1,7 @@
 package local.mahouse.rovercontroller;
 
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.Toolbar;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import local.mahouse.rovercontroller.ui.home.HomeFragment;
 
@@ -85,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_con_dis:
 
                 String addr = HomeFragment.getIPText(); //Un fil separat no pot tocar les vistes d'un altre fil (main)
-                AtomicBoolean failed = new AtomicBoolean(false);
+                //wait() and notify() don't work in this code... So I make my own
                 //Spaguetti code!!!
                 if(Singleton.isConnected() == false) {
 
@@ -93,28 +95,28 @@ public class MainActivity extends AppCompatActivity {
                     new Thread(() -> {
                         try {
                             Singleton.connect(addr); //Provem de connectar
+                            runOnUiThread(() -> {
+                                item.setTitle(R.string.disconnect_button);
+                                Snackbar.make(getWindow().getDecorView(), getText(R.string.connected) + addr,
+                                        Snackbar.LENGTH_LONG).show();
+                            });
                         } catch (NoRouteToHostException e) {
-                            failed.set(true);
+
                             runOnUiThread(() -> //Run toast on (main) thread
-                                    Toast.makeText(this, getText(R.string.error_NoRouteToHostException), Toast.LENGTH_LONG).show());
+                                Toast.makeText(this, getText(R.string.error_NoRouteToHostException), Toast.LENGTH_LONG).show());
+
                         } catch (ConnectException e) {
-                            failed.set(true);
+
                             runOnUiThread(() -> //So we can create a toast notification
-                                    Toast.makeText(this, getText(R.string.error_ConnectException), Toast.LENGTH_LONG).show());
+                                Toast.makeText(this, getText(R.string.error_ConnectException), Toast.LENGTH_LONG).show());
 
 
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
+
                     }).start();
-                    //If we don't fail to connect
-                    if (failed.get() == false) {
-                        item.setTitle(R.string.disconnect_button);
-                        Snackbar.make(getWindow().getDecorView(), getText(R.string.connected) + addr,
-                                Snackbar.LENGTH_LONG).show();
-                    }else{
-                        Singleton.setConnected(false);
-                    }
+
 
                 }else{
                     item.setTitle(R.string.connect_button);
@@ -123,12 +125,14 @@ public class MainActivity extends AppCompatActivity {
                         new Thread(() -> {
                             try {
                                 Singleton.disconnect();
+                                runOnUiThread(() ->
+                                    Snackbar.make(getWindow().getDecorView(), getText(R.string.disconnected),
+                                            Snackbar.LENGTH_LONG).show());
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }
                         }).start();
-                        Snackbar.make(getWindow().getDecorView(), getText(R.string.disconnected),
-                                Snackbar.LENGTH_LONG).show();
+
                     } catch (Exception e) {
                         //throw new RuntimeException(e);
                         Snackbar.make(getParent().getCurrentFocus(), getText(R.string.error_IOException), BaseTransientBottomBar.LENGTH_LONG)
