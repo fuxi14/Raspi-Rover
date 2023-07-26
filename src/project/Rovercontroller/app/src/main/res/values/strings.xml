@@ -24,4 +24,6 @@
     <string name="disconnected">Successfully disconnected from server</string>
     <string name="error_NoRouteToHostException">Error: NoRouteToHostException. Perhaps IP is incorrect or port 9876 is closed on server firewall?</string>
     <string name="error_ConnectException">Error: Conection was refused. Perhaps server software is not running?</string>
+    <string name="error_sending_message">Cound not send message, IOException</string>
+    <string name="error_not_connected">Could not send message: No connection with server</string>
 </resources>

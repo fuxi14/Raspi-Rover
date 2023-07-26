@@ -33,15 +33,34 @@ public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
 
+    //Inicialitzem el Singleton
+    Singleton mSingleton = Singleton.getInstance();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main); //M'ho havia deixat, F
 
+        //Still cannot be implemented
+        /*Thread fallback = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //Observem si estem connectats i si el fil que escolta ha mort
+                if(mSingleton.isConnected()) {
+                    if(!mSingleton.listener.isAlive()) {
+
+                    }
+                }
+
+            }
+        });*/
+
         //Inicialitzem la barra d'eines i el botó flotant
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         setSupportActionBar(toolbar);
+        
+
 
 
         fab.setOnClickListener(new View.OnClickListener() {
@@ -87,53 +106,56 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_con_dis:
 
                 String addr = HomeFragment.getIPText(); //Un fil separat no pot tocar les vistes d'un altre fil (main)
-                //wait() and notify() don't work in this code... So I make my own
+
                 //Spaguetti code!!!
-                if(Singleton.isConnected() == false) {
-
-                    //Correm el codi que controla la xarxa en un fil separat
-                    new Thread(() -> {
-                        try {
-                            Singleton.connect(addr); //Provem de connectar
-                            runOnUiThread(() -> {
-                                item.setTitle(R.string.disconnect_button);
-                                Snackbar.make(getWindow().getDecorView(), getText(R.string.connected) + addr,
-                                        Snackbar.LENGTH_LONG).show();
-                            });
-                        } catch (NoRouteToHostException e) {
-
-                            runOnUiThread(() -> //Run toast on (main) thread
-                                Toast.makeText(this, getText(R.string.error_NoRouteToHostException), Toast.LENGTH_LONG).show());
-
-                        } catch (ConnectException e) {
-
-                            runOnUiThread(() -> //So we can create a toast notification
-                                Toast.makeText(this, getText(R.string.error_ConnectException), Toast.LENGTH_LONG).show());
+                if(mSingleton.isConnected() == false) {
 
 
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
+
+                    try {
+                        //Provem de connectar
+                        Exception su;
+                        su = mSingleton.connect(addr);
+                        if (su != null) { //Sortim si ha hagut un error
+                            throw su;
                         }
+                        item.setTitle(R.string.disconnect_button);
+                        Snackbar.make(getWindow().getDecorView(), getText(R.string.connected) + addr,
+                                Snackbar.LENGTH_LONG).show();
 
-                    }).start();
+
+
+                    } catch (NoRouteToHostException e) {
+                                Toast.makeText(this, getText(R.string.error_NoRouteToHostException), Toast.LENGTH_LONG).show();
+
+
+
+                    } catch (ConnectException e) {
+                        Toast.makeText(this, getText(R.string.error_ConnectException), Toast.LENGTH_LONG).show();
+
+
+
+
+                    } catch (IOException e) {
+                        Toast.makeText(this, getText(R.string.error_IOException), Toast.LENGTH_SHORT).show();
+
+
+
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
 
 
                 }else{
                     item.setTitle(R.string.connect_button);
                     try {
-                        //Correm el codi que controla la xarxa en un fil separat
-                        new Thread(() -> {
-                            try {
-                                Singleton.disconnect();
-                                runOnUiThread(() ->
-                                    Snackbar.make(getWindow().getDecorView(), getText(R.string.disconnected),
-                                            Snackbar.LENGTH_LONG).show());
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                        }).start();
+                        mSingleton.disconnect();
 
-                    } catch (Exception e) {
+                        Snackbar.make(getWindow().getDecorView(), getText(R.string.disconnected),
+                                Snackbar.LENGTH_LONG).show();
+                        //Correm el codi que controla la xarxa en un fil separat
+
+                    } catch (IOException e) {
                         //throw new RuntimeException(e);
                         Snackbar.make(getParent().getCurrentFocus(), getText(R.string.error_IOException), BaseTransientBottomBar.LENGTH_LONG)
                                 .show();

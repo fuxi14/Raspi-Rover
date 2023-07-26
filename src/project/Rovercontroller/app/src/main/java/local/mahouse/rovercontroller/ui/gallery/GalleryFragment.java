@@ -11,10 +11,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
 import local.mahouse.rovercontroller.R;
+import local.mahouse.rovercontroller.Singleton;
+
 public class GalleryFragment extends Fragment {
 
 
@@ -38,11 +41,33 @@ public class GalleryFragment extends Fragment {
         list.setAdapter(result);
         result.notifyDataSetChanged();
 
+        new Thread(() -> {
+            while(true) {
+                //Listen for incoming messages
+                if(!Singleton.isBufferEmpty()) {
+                    getActivity().runOnUiThread(() -> {
+                        strMessages.addAll(Singleton.messages);
+                        result.notifyDataSetChanged();
+                        Singleton.messages.clear();
+                        Singleton.setBufferEmpty(true);
+                    });
+                }
+            }
+        }).start();
+
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                strMessages.add(message.getText().toString());
-                result.notifyDataSetChanged();
+                if(Singleton.isConnected()) {
+                    if (!Singleton.sendIt(message.getText().toString())) {
+                        Toast.makeText(getContext(), getText(R.string.error_sending_message), Toast.LENGTH_LONG).show();
+                    } else {
+                        strMessages.add("[Me] " + message.getText().toString());
+                        result.notifyDataSetChanged();
+                    }
+                } else {
+                    Toast.makeText(getContext(), getText(R.string.error_not_connected), Toast.LENGTH_LONG).show();
+                }
             }
         });
 
