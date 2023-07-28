@@ -2,9 +2,11 @@ package local.mahouse.rovercontroller.ui.slideshow;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -23,46 +25,92 @@ public class SlideshowFragment extends Fragment {
 
 
 
-        //Gif que indica la direcció
+        //Gif que indica la direcció i signe d'Stop
         GifImageView direction = (GifImageView) slideshowFragment.findViewById(R.id.gifDirection);
+        ImageView stop = (ImageView) slideshowFragment.findViewById(R.id.imgStop);
 
+        //Botons de direcció
         ImageButton btnForward = (ImageButton) slideshowFragment.findViewById(R.id.btnForward);
         ImageButton btnReverse = (ImageButton) slideshowFragment.findViewById(R.id.btnReverse);
         ImageButton btnLeft = (ImageButton) slideshowFragment.findViewById(R.id.btnLeft);
         ImageButton btnRight = (ImageButton) slideshowFragment.findViewById(R.id.btnRight);
 
-        btnForward.setOnClickListener(new View.OnClickListener() {
+
+
+
+        btnForward.setOnTouchListener(new View.OnTouchListener() {
+
             @Override
-            public void onClick(View view) {
-                direction.setRotation(-90);
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                    stop.setVisibility(View.INVISIBLE);
+                    direction.setVisibility(View.VISIBLE);
+                    direction.setRotation(-90);
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                    direction.setVisibility(View.INVISIBLE);
+                    stop.setVisibility(View.VISIBLE);
+
+                }
+                return true;
             }
         });
 
-        btnReverse.setOnClickListener(new View.OnClickListener() {
+        btnReverse.setOnTouchListener(new View.OnTouchListener() {
+
             @Override
-            public void onClick(View view) {
-                direction.setRotation(90);
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                    stop.setVisibility(View.INVISIBLE);
+                    direction.setVisibility(View.VISIBLE);
+                    direction.setRotation(90);
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                    direction.setVisibility(View.INVISIBLE);
+                    stop.setVisibility(View.VISIBLE);
+
+                }
+                return true;
             }
         });
 
-        btnLeft.setOnClickListener(new View.OnClickListener() {
+        btnLeft.setOnTouchListener(new View.OnTouchListener() {
+
             @Override
-            public void onClick(View view) {
-                direction.setRotation(180);
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                    stop.setVisibility(View.INVISIBLE);
+                    direction.setVisibility(View.VISIBLE);
+                    direction.setRotation(180);
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                    direction.setVisibility(View.INVISIBLE);
+                    stop.setVisibility(View.VISIBLE);
+
+                }
+                return true;
             }
         });
 
-        btnRight.setOnClickListener(new View.OnClickListener() {
+        btnRight.setOnTouchListener(new View.OnTouchListener() {
+
             @Override
-            public void onClick(View view) {
-                direction.setRotation(0);
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                    stop.setVisibility(View.INVISIBLE);
+                    direction.setVisibility(View.VISIBLE);
+                    direction.setRotation(0);
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                    direction.setVisibility(View.INVISIBLE);
+                    stop.setVisibility(View.VISIBLE);
+
+                }
+                return true;
             }
         });
 
-
-        //NO TOCAR
+   //NO TOCAR
         return slideshowFragment;
     }
+
+
 
     @Override
     public void onDestroyView() {
