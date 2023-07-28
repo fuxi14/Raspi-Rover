@@ -8,8 +8,8 @@
     <string name="action_settings">Settings</string>
 
     <string name="menu_home">Home</string>
-    <string name="menu_gallery">Gallery</string>
-    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_gallery">Text Message</string>
+    <string name="menu_slideshow">Manual Control</string>
     <string name="enter_ip_address_hint">Enter IP address</string>
     <string name="connect_button">Connect</string>
     <string name="disconnect_button">Disconnect</string>
@@ -26,4 +26,6 @@
     <string name="error_ConnectException">Error: Conection was refused. Perhaps server software is not running?</string>
     <string name="error_sending_message">Cound not send message, IOException</string>
     <string name="error_not_connected">Could not send message: No connection with server</string>
+    <string name="motor_speed_1">Left Motor Speed</string>
+    <string name="motor_speed_2">Right Motor Speed</string>
 </resources>
