@@ -5,6 +5,8 @@
  */
 package local.mahouse;
 
+
+
 import com.pi4j.Pi4J;
 import com.pi4j.context.Context;
 import com.pi4j.io.gpio.digital.DigitalOutput;
@@ -13,6 +15,9 @@ import com.pi4j.io.pwm.Pwm;
 import com.pi4j.io.pwm.PwmType;
 import com.pi4j.platform.Platforms;
 import com.pi4j.util.Console;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.lang.reflect.InvocationTargetException;
 
 /**
@@ -190,8 +195,16 @@ public class Main {
         
         
         Movement move = new Movement();
+        
+        console.println("Opening server...");
+        //Obrim server
+        Server server = new Server("Server");
+        server.start();
+            
+        /*
+        //DEPRECATED    
         Input reader = new Input("Reader");
-        reader.start();
+        reader.start();*/
 
         int imSpeed;
         boolean working = true;

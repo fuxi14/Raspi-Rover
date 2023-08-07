@@ -3,9 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>local.mahouse</groupId>
     <artifactId>learningpi</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
     <packaging>jar</packaging>
-    <name>Raspi Project</name>
+    <name>Learning Pi</name>
+    
+    
 
     <!--
     <organization>
@@ -58,6 +60,9 @@
             <artifactId>pi4j-plugin-pigpio</artifactId>
             <version>${pi4j.version}</version>
         </dependency>
+        
+        
+        
     </dependencies>
         
     <build>

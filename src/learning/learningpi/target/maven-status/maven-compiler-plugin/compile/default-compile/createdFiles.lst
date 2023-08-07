@@ -1,5 +1,6 @@
-local/mahouse/Main.class
+local/mahouse/Server.class
 module-info.class
-local/mahouse/Main$1Movement.class
 local/mahouse/Input.class
+local/mahouse/Main.class
+local/mahouse/Main$1Movement.class
 local/mahouse/Resource.class
