@@ -196,7 +196,7 @@ public class Singleton {
                     try {
                         oos.writeObject(message);
                     } catch (IOException e) {
-                        Singleton.statConnect = e;
+                        statConnect = e;
                     }
                 }).start();
 
@@ -221,7 +221,7 @@ public class Singleton {
     }
 
     //Send BYTE ARRAY to server
-    public static boolean sendIt(byte[] data) {
+    public static boolean sendIt(int[] data) {
         if(isConnected()) {
             statConnect = null;
             try {
@@ -230,8 +230,9 @@ public class Singleton {
                 new Thread(() -> {
                     try {
                         oos.writeObject(data);
+                        oos.reset(); //All it took to fucking solve the bug that only sent the same message
                     } catch (IOException e) {
-                        Singleton.statConnect = e;
+                        statConnect = e;
                     }
                 }).start();
 

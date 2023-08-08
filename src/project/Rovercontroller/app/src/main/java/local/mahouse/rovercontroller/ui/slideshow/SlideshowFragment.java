@@ -27,20 +27,19 @@ public class SlideshowFragment extends Fragment {
      * Documentació (F*cking again per cagar-la)
      * Modes del rover (enviat amb l'array)
      * Index:
-     * 0 = mode: 0x00 = Res | 0x01 = Control Manual | 0x02 = Control Automàtic (seguir línea) | 0x03 = Prova amb text | 0x04 = Comunicació server - client | 0x05 = Comunicació Client - Server
-     * 1 (0x01) = direcció/gir: 0x00 = parar | 0x01 = Endevant | 0x02 = Endarrere | 0x03 = Girar Esquerre | 0x04 = Girar Dreta
-     * 1 (0x02) = Anar o no: 0x00 = Deixar de seguir | 0x01 = Seguir
-     * 1 (0x04) = Comm Ser-Cli: 0x00 - 0x04 = Canviar icona direcció a l'aplicació de mòbil | 0xee = Hi ha hagut un error | 0xff = Tancar connecció
-     * 1 (0x05) = Comm Cli-Ser: 0xff = Tancar connecció
-     * 2 (0x01) Velocitat motor esquerre (0x00 - 0xFF)
+     * 0 = mode: 0 = Res | 1 = Control Manual | 2 = Control Automàtic (seguir línea) | 3 = Prova amb text | 4 = Comunicació server - client | 5 = Comunicació Client - Server
+     * 1 (1) = direcció/gir: 0 = parar | 1 = Endevant | 2 = Endarrere | 3 = Girar Esquerre | 4 = Girar Dreta
+     * 1 (2) = Anar o no: 0 = Deixar de seguir | 1 = Seguir
+     * 1 (4) = Comm Ser-Cli: 0 - 4 = Canviar icona direcció a l'aplicació de mòbil | 0xee = Hi ha hagut un error | 0xff = Tancar connecció
+     * 1 (5) = Comm Cli-Ser: 0xff = Tancar connecció
+     * 2 (1) Velocitat motor esquerre (0 - 0xFF)
      *
-     * 3 (0x01) Velocitat motor dreta (0x00 - 0xFF)
+     * 3 (1) Velocitat motor dreta (0 - 0xFF)
      *
      */
 
-    byte[] data = new byte[4];
+    int[] data = new int[4];
 
-    Integer buffer;
 
     @SuppressLint("ClickableViewAccessibility")
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -74,13 +73,11 @@ public class SlideshowFragment extends Fragment {
                     if (event.getAction() == MotionEvent.ACTION_DOWN) {
 
                         //Control manual: tirar endevant
-                        data[0] = 0x01;
-                        data[1] = 0x01;
+                        data[0] = 1;
+                        data[1] = 1;
                         //Speed
-                        buffer = speedLeft.getProgress();
-                        data[2] = buffer.byteValue();
-                        buffer = speedRight.getProgress();
-                        data[3] = buffer.byteValue();
+                        data[2] = speedLeft.getProgress();
+                        data[3] = speedRight.getProgress();
 
                         Singleton.sendIt(data);
 
@@ -91,10 +88,10 @@ public class SlideshowFragment extends Fragment {
                     } else if (event.getAction() == MotionEvent.ACTION_UP) {
 
 
-                        data[0] = 0x01;
-                        data[1] = 0x00;
-                        data[2] = 0x00;
-                        data[3] = 0x00;
+                        data[0] = 1;
+                        data[1] = 0;
+                        data[2] = 0;
+                        data[3] = 0;
 
                         Singleton.sendIt(data);
 
@@ -118,15 +115,14 @@ public class SlideshowFragment extends Fragment {
                     if (event.getAction() == MotionEvent.ACTION_DOWN) {
 
                         //Control manual: tirar endarrere
-                        data[0] = 0x01;
-                        data[1] = 0x02;
+                        data[0] = 1;
+                        data[1] = 2;
                         //Speed
-                        buffer = speedLeft.getProgress();
-                        data[2] = buffer.byteValue();
-                        buffer = speedRight.getProgress();
-                        data[3] = buffer.byteValue();
+                        data[2] = speedLeft.getProgress();
+                        data[3] = speedRight.getProgress();
 
                         Singleton.sendIt(data);
+
 
                         stop.setVisibility(View.INVISIBLE);
                         direction.setVisibility(View.VISIBLE);
@@ -135,10 +131,10 @@ public class SlideshowFragment extends Fragment {
                     } else if (event.getAction() == MotionEvent.ACTION_UP) {
 
 
-                        data[0] = 0x01;
-                        data[1] = 0x00;
-                        data[2] = 0x00;
-                        data[3] = 0x00;
+                        data[0] = 1;
+                        data[1] = 0;
+                        data[2] = 0;
+                        data[3] = 0;
 
                         Singleton.sendIt(data);
 
@@ -162,13 +158,11 @@ public class SlideshowFragment extends Fragment {
                     if (event.getAction() == MotionEvent.ACTION_DOWN) {
 
                         //Control manual: Girar Esquerre
-                        data[0] = 0x01;
-                        data[1] = 0x03;
+                        data[0] = 1;
+                        data[1] = 3;
                         //Speed
-                        buffer = speedLeft.getProgress();
-                        data[2] = buffer.byteValue();
-                        buffer = speedRight.getProgress();
-                        data[3] = buffer.byteValue();
+                        data[2] = speedLeft.getProgress();
+                        data[3] = speedRight.getProgress();
 
                         Singleton.sendIt(data);
 
@@ -178,10 +172,10 @@ public class SlideshowFragment extends Fragment {
 
                     } else if (event.getAction() == MotionEvent.ACTION_UP) {
 
-                        data[0] = 0x01;
-                        data[1] = 0x00;
-                        data[2] = 0x00;
-                        data[3] = 0x00;
+                        data[0] = 1;
+                        data[1] = 0;
+                        data[2] = 0;
+                        data[3] = 0;
 
                         Singleton.sendIt(data);
 
@@ -206,13 +200,11 @@ public class SlideshowFragment extends Fragment {
                     if (event.getAction() == MotionEvent.ACTION_DOWN) {
 
                         //Control manual: Girar Dreta
-                        data[0] = 0x01;
-                        data[1] = 0x04;
+                        data[0] = 1;
+                        data[1] = 4;
                         //Speed
-                        buffer = speedLeft.getProgress();
-                        data[2] = buffer.byteValue();
-                        buffer = speedRight.getProgress();
-                        data[3] = buffer.byteValue();
+                        data[2] = speedLeft.getProgress();
+                        data[3] = speedRight.getProgress();
 
                         Singleton.sendIt(data);
 
@@ -222,10 +214,10 @@ public class SlideshowFragment extends Fragment {
 
                     } else if (event.getAction() == MotionEvent.ACTION_UP) {
 
-                        data[0] = 0x01;
-                        data[1] = 0x00;
-                        data[2] = 0x00;
-                        data[3] = 0x00;
+                        data[0] = 1;
+                        data[1] = 0;
+                        data[2] = 0;
+                        data[3] = 0;
 
                         Singleton.sendIt(data);
 

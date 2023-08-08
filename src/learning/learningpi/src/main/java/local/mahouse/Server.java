@@ -44,17 +44,18 @@ public class Server extends Thread{
     * Documentació (F*cking again per cagar-la)
     * Modes del rover (enviat amb l'array)
     * Index:
-    * 0 = mode: 0x00 = Res | 0x01 = Control Manual | 0x02 = Control Automàtic (seguir línea) | 0x03 = Prova amb text | 0x04 = Comunicació server - client | 0x05 = Comunicació Client - Server
-    * 1 (0x01) = direcció/gir: 0x00 = parar | 0x01 = Endevant | 0x02 = Endarrere | 0x03 = Girar Esquerre | 0x04 = Girar Dreta
-    * 1 (0x02) = Anar o no: 0x00 = Deixar de seguir | 0x01 = Seguir
-    * 1 (0x04) = Comm Ser-Cli: 0x00 - 0x04 = Canviar icona direcció a l'aplicació de mòbil | 0xee = Hi ha hagut un error | 0xff = Tancar connecció
-    * 1 (0x05) = Comm Cli-Ser: 0xff = Tancar connecció
-    * 2 (0x01) Velocitat motor esquerre (0x00 - 0xFF)
+    * 0 = mode: 0 = Res | 1 = Control Manual | 2 = Control Automàtic (seguir línea) | 3 = Prova amb text | 4 = Comunicació server - client | 5 = Comunicació Client - Server
+    * 1 (1) = direcció/gir: sendData = parar | 1 = Endevant | 2 = Endarrere | 3 = Girar Esquerre | 4 = Girar Dreta
+    * 1 (2) = Anar o no: 0 = Deixar de seguir | 1 = Seguir
+    * 1 (4) = Comm Ser-Cli: 0 - 4 = Canviar icona direcció a l'aplicació de mòbil | 128 = Hi ha hagut un error | 255 = Tancar connecció
+    * 1 (5) = Comm Cli-Ser: 255 = Tancar connecció
+    * 2 (1) Velocitat motor esquerre (0 - 0xFF)
     *
-    * 3 (0x01) Velocitat motor dreta (0x00 - 0xFF)
+    * 3 (1) Velocitat motor dreta (0 - 0xFF)
     *  
     */
-    private static byte[] data = new byte[4];
+    private int[] data;
+    private int[] sendData = new int[4];
    
     
     Server(String name) {
@@ -103,52 +104,57 @@ public class Server extends Thread{
             while(working) {
 
                 console.println("Waiting for input...", this);
-                //Convertim l'Input Stream en un "String"
-                data = (byte[]) ois.readObject();
+                
+                //We clean and recieve new data array
+                //message = (String) ois.readObject();
+                data = (int[]) ois.readObject();
                 console.println("Data array recieved", this);
                 
+                //console.println(message, this);
+                //data = new Byte[4];
+                //data[0] = 0;
                 //Processem les dades rebudes
                 switch(data[0]) {
-                    case 0x00: //No fer res
+                    case 0: //No fer res
                         console.println("We don't do anything", this);
                         break;
-                    case 0x01: //Moure manualment
+                    case 1: //Moure manualment
                         //Processem les dades per moure manualment
                         switch(data[1]) {
-                            case 0x00:
+                            case 0:
                                 Resource.word = "stop";
-                                data[0] = 0x04;
-                                data[1] = 0x00;
+                                sendData[0] = 4;
+                                sendData[1] = 0;
                                 break;
-                            case 0x01:
+                            case 1:
                                 Resource.word = "forward";
-                                data[0] = 0x04;
-                                data[1] = 0x01;
+                                sendData[0] = 4;
+                                sendData[1] = 1;
                                 break;
-                            case 0x02:
+                            case 2:
                                 Resource.word = "reverse";
-                                data[0] = 0x04;
-                                data[1] = 0x02;
+                                sendData[0] = 4;
+                                sendData[1] = 2;
                                 break;
-                            case 0x03:
+                            case 3:
                                 Resource.word = "left";
-                                data[0] = 0x04;
-                                data[1] = 0x03;
+                                sendData[0] = 4;
+                                sendData[1] = 3;
                                 break;
-                            case 0x04:
+                            case 4:
                                 Resource.word = "right";
-                                data[0] = 0x04;
-                                data[1] = 0x04;
+                                sendData[0] = 4;
+                                sendData[1] = 4;
                                 break;
                             default:
-                                data[0] = 0x04;
-                                data[1] = (byte) 0xEE;
+                                sendData[0] = 4;
+                                sendData[1] = (byte) 0xEE;
                                 console.println("WARNING: Movement option not reconized, not changing anything", this);
                                 break;
                         }
                         //Enviem resposta
                         //Encara no, però
-                        //oos.writeObject(data);
+                        //oos.writeObject(sendData);
                         
                         //TODO: Processar dades de velocitat 
                         
@@ -158,7 +164,7 @@ public class Server extends Thread{
                         break;
                         
                 }
-                
+                data = null;
             }
                 
                 /*
