@@ -104,7 +104,7 @@ public class SlideshowFragment extends Fragment {
                     }
                 return true;
                 } else {
-                    Toast.makeText(null, getText(R.string.no_connection_text), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), getActivity().getText(R.string.no_connection_text), Toast.LENGTH_LONG).show();
                   return false;
                 }
             }
@@ -148,7 +148,7 @@ public class SlideshowFragment extends Fragment {
                     }
                     return true;
                 } else {
-                Toast.makeText(null, getText(R.string.no_connection_text), Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), getText(R.string.no_connection_text), Toast.LENGTH_LONG).show();
                 return false;
             }
         }
@@ -192,7 +192,7 @@ public class SlideshowFragment extends Fragment {
                     }
                     return true;
                 } else {
-                    Toast.makeText(null, getText(R.string.no_connection_text), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), getText(R.string.no_connection_text), Toast.LENGTH_LONG).show();
                     return false;
                 }
             }
@@ -236,7 +236,7 @@ public class SlideshowFragment extends Fragment {
                     }
                     return true;
                 } else {
-                    Toast.makeText(null, getText(R.string.no_connection_text), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), getText(R.string.no_connection_text), Toast.LENGTH_LONG).show();
                     return false;
                 }
             }
