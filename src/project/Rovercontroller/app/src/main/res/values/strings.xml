@@ -28,4 +28,6 @@
     <string name="error_not_connected">Could not send message: No connection with server</string>
     <string name="motor_speed_1">Left Motor Speed</string>
     <string name="motor_speed_2">Right Motor Speed</string>
+    <string name="deprecated_text">DEPRECATED</string>
+    <string name="no_connection_text">Not connected to server</string>
 </resources>

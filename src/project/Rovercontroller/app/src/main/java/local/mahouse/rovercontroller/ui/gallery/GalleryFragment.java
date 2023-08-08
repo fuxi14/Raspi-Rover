@@ -25,6 +25,8 @@ public class GalleryFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         View galleryFragment = inflater.inflate(R.layout.fragment_gallery, container, false);//You f*ucking idiot
 
+        // -------------------------- DEPRECATED -------------------------
+        /*
         //Inicialitzem els objectes en pantalla i l'adaptador per la llista
         final Button send = galleryFragment.findViewById(R.id.btnSend);
         final EditText message = galleryFragment.findViewById(R.id.editTextMessage);
@@ -41,15 +43,16 @@ public class GalleryFragment extends Fragment {
         list.setAdapter(result);
         result.notifyDataSetChanged();
 
+
         new Thread(() -> {
             while(true) {
                 //Listen for incoming messages
-                if(!Singleton.isBufferEmpty()) {
+                if(!Singleton.isStringBufferEmpty()) {
                     getActivity().runOnUiThread(() -> {
                         strMessages.addAll(Singleton.messages);
                         result.notifyDataSetChanged();
                         Singleton.messages.clear();
-                        Singleton.setBufferEmpty(true);
+                        Singleton.setStringBufferEmpty(true);
                     });
                 }
             }
@@ -71,11 +74,7 @@ public class GalleryFragment extends Fragment {
             }
         });
 
-
-
-
-
-
+         */
 
         return galleryFragment;
     }
@@ -84,4 +83,5 @@ public class GalleryFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
     }
+
 }

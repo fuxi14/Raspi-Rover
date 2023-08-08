@@ -18,15 +18,20 @@ import java.util.ArrayList;
 
 public class Singleton {
 
-    static InetAddress host;
-    static Socket socket;
-    static ObjectOutputStream oos = null;
-    static ObjectInputStream ois = null;
-    static boolean connected = false;
-    static boolean bufferEmpty = true;
+    private static InetAddress host;
+    private static Socket socket;
+    private static ObjectOutputStream oos = null;
+    private static ObjectInputStream ois = null;
+    private static boolean connected = false;
+    private static boolean bufferEmpty = true;
+    private static boolean stringBufferEmpty = true;
     public static ArrayList<String> messages = new ArrayList<String>();
-    static String addr, mMessage;
+    private static String addr;
+    public static String mMessage;
     static Exception statConnect = null;
+
+    static byte[] sendData = new byte[4]; //Data that we send to the server
+    private static byte[] recievedData = new byte[4]; //Data that we recieve from the server
 
     static Object lock = new Object(); //Use to notify the main thread to continue
 
@@ -34,6 +39,9 @@ public class Singleton {
 
     //Creem un fil que connecta amb el server i escolta missatges que vénen del servidor
     public static final Runnable listener = new Runnable() {
+
+        //Algunes variables del fil
+        byte[] localData;
         @Override
         public void run() {
             //Connecció
@@ -53,7 +61,7 @@ public class Singleton {
                 } catch (IOException e) {
                     Singleton.statConnect = e;
                 } finally {
-                    System.out.println("[Thread] And we notify");
+                    System.out.println("[Thread] And we notify main thread");
                     Singleton.lock.notify();
                 }
 
@@ -62,10 +70,22 @@ public class Singleton {
             //Escolta
             while(true) {
                 try {
+
+                    //We read the data
+                    localData = (byte[]) ois.readObject();
+                    Singleton.setRecievedData(localData);
+                    //Processem les dades
+                    if(localData[0] == 0x04) {
+                        if(localData[1] != (byte) 0xEE) {//Si no hi ha hagut un error en el server
+                            Singleton.setBufferEmpty(false);
+                        }
+                    }
+                    /*
+                    //DEPRECATED FOR NOW
                     mMessage = ois.readObject().toString();
                     Singleton.messages.add(mMessage); //Afegim missatges
                     System.out.println("[Listener] added message: \"" + mMessage + "\"");
-
+                    */
                     if(Singleton.isBufferEmpty()) {
                         Singleton.setBufferEmpty(false);
                     }
@@ -93,6 +113,8 @@ public class Singleton {
     // Private constructor prevents instantiation from other classes
     private Singleton() {}
 
+
+    //--------------------------- START OF GETTERS AND SETTERS -----------------------------
     public static Singleton getInstance() {
         return instance;
     }
@@ -113,7 +135,27 @@ public class Singleton {
         Singleton.bufferEmpty = bufferEmpty;
     }
 
-    public Exception connect(String addr) throws NoRouteToHostException, ConnectException, IOException {
+
+    public static byte[] getRecievedData() {
+        return recievedData;
+    }
+
+    public static void setRecievedData(byte[] recievedData) {
+        Singleton.recievedData = recievedData;
+    }
+
+    public static boolean isStringBufferEmpty() {
+        return stringBufferEmpty;
+    }
+
+    public static void setStringBufferEmpty(boolean stringBufferEmpty) {
+        Singleton.stringBufferEmpty = stringBufferEmpty;
+    }
+
+    //-------------------------- END OF GETTERS AND SETTERS -------------------------------
+
+
+    public Exception connect(String addr) {
 
         this.addr = addr;
 
@@ -142,7 +184,7 @@ public class Singleton {
         connected = false;
     }
 
-    //We send a message
+    //We send a STRING message
     public static boolean sendIt(String message) {
         if(isConnected()) {
             statConnect = null;
@@ -178,5 +220,38 @@ public class Singleton {
         return false;
     }
 
+    //Send BYTE ARRAY to server
+    public static boolean sendIt(byte[] data) {
+        if(isConnected()) {
+            statConnect = null;
+            try {
+
+                //La xarxa s'ha de fer servir en un fil different
+                new Thread(() -> {
+                    try {
+                        oos.writeObject(data);
+                    } catch (IOException e) {
+                        Singleton.statConnect = e;
+                    }
+                }).start();
+
+                //Si ha fallat l'enviament
+                if (statConnect != null) {
+                    throw statConnect;
+                }
+                return true;
+
+
+            } catch (IOException e) {
+                return false;
+
+
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return false;
+    }
 
 }

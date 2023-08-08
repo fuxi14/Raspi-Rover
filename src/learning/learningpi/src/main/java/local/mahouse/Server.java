@@ -19,6 +19,8 @@ import java.util.logging.Logger;
  * Font: https://www.digitalocean.com/community/tutorials/java-socket-programming-server-client
  * @author Marcel, pankaj
  */
+
+
 public class Server extends Thread{
     //Necessari per crear el fil
     private Thread t;
@@ -35,7 +37,25 @@ public class Server extends Thread{
     private static String message = "";
     //Consola de sortida
     private static final Console console = new Console();
+    
     private static boolean canRetry = true;
+    
+    /*
+    * Documentació (F*cking again per cagar-la)
+    * Modes del rover (enviat amb l'array)
+    * Index:
+    * 0 = mode: 0x00 = Res | 0x01 = Control Manual | 0x02 = Control Automàtic (seguir línea) | 0x03 = Prova amb text | 0x04 = Comunicació server - client | 0x05 = Comunicació Client - Server
+    * 1 (0x01) = direcció/gir: 0x00 = parar | 0x01 = Endevant | 0x02 = Endarrere | 0x03 = Girar Esquerre | 0x04 = Girar Dreta
+    * 1 (0x02) = Anar o no: 0x00 = Deixar de seguir | 0x01 = Seguir
+    * 1 (0x04) = Comm Ser-Cli: 0x00 - 0x04 = Canviar icona direcció a l'aplicació de mòbil | 0xee = Hi ha hagut un error | 0xff = Tancar connecció
+    * 1 (0x05) = Comm Cli-Ser: 0xff = Tancar connecció
+    * 2 (0x01) Velocitat motor esquerre (0x00 - 0xFF)
+    *
+    * 3 (0x01) Velocitat motor dreta (0x00 - 0xFF)
+    *  
+    */
+    private static byte[] data = new byte[4];
+   
     
     Server(String name) {
         threadName = name;
@@ -48,7 +68,7 @@ public class Server extends Thread{
             canRetry = false;
             try {
                 this.on();
-           } catch (IOException ex) {
+           } catch (IOException ex) { //OK Houston we've had a problem here
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
@@ -66,7 +86,7 @@ public class Server extends Thread{
         }
     }
     
-    public void on() throws IOException, ClassNotFoundException, EOFException{
+    public void on() throws IOException, ClassNotFoundException{
         try {
             //Creem objecte server
             service = new ServerSocket(port);
@@ -84,11 +104,65 @@ public class Server extends Thread{
 
                 console.println("Waiting for input...", this);
                 //Convertim l'Input Stream en un "String"
-                message = (String) ois.readObject();
-                //Passem el valor obtingut al fil principal
+                data = (byte[]) ois.readObject();
+                console.println("Data array recieved", this);
                 
+                //Processem les dades rebudes
+                switch(data[0]) {
+                    case 0x00: //No fer res
+                        console.println("We don't do anything", this);
+                        break;
+                    case 0x01: //Moure manualment
+                        //Processem les dades per moure manualment
+                        switch(data[1]) {
+                            case 0x00:
+                                Resource.word = "stop";
+                                data[0] = 0x04;
+                                data[1] = 0x00;
+                                break;
+                            case 0x01:
+                                Resource.word = "forward";
+                                data[0] = 0x04;
+                                data[1] = 0x01;
+                                break;
+                            case 0x02:
+                                Resource.word = "reverse";
+                                data[0] = 0x04;
+                                data[1] = 0x02;
+                                break;
+                            case 0x03:
+                                Resource.word = "left";
+                                data[0] = 0x04;
+                                data[1] = 0x03;
+                                break;
+                            case 0x04:
+                                Resource.word = "right";
+                                data[0] = 0x04;
+                                data[1] = 0x04;
+                                break;
+                            default:
+                                data[0] = 0x04;
+                                data[1] = (byte) 0xEE;
+                                console.println("WARNING: Movement option not reconized, not changing anything", this);
+                                break;
+                        }
+                        //Enviem resposta
+                        //Encara no, però
+                        //oos.writeObject(data);
+                        
+                        //TODO: Processar dades de velocitat 
+                        
+                        break;
+                    default:
+                        console.println("WARNING: Verb not reconized, not doing anything", this);
+                        break;
+                        
+                }
                 
+            }
                 
+                /*
+                //For now, this is no longer in use
                 console.println("Message recieved: " + message, this);
                 console.println("Responding to client... ", this);
                 //Responem al client:
@@ -104,7 +178,7 @@ public class Server extends Thread{
                 } else {
                     Resource.word = message;
                 }
-            }
+            }*/
             console.println("Goodbye!", this);
             
         }
