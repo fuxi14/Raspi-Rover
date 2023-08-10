@@ -148,16 +148,24 @@ public class Server extends Thread{
                                 break;
                             default:
                                 sendData[0] = 4;
-                                sendData[1] = (byte) 0xEE;
+                                sendData[1] = 128;
                                 console.println("WARNING: Movement option not reconized, not changing anything", this);
                                 break;
                         }
                         //Enviem resposta
                         //Encara no, però
-                        //oos.writeObject(sendData);
+                      /*oos.writeObject(sendData);
+                        oos.reset(); */
                         
                         //TODO: Processar dades de velocitat 
                         
+                        break;
+                        
+                    //Rebuda petició per apagar
+                    case 255:
+                        console.println("Off signal recieved, turning off system...");
+                        Resource.word = "quit";
+                        working = false;
                         break;
                     default:
                         console.println("WARNING: Verb not reconized, not doing anything", this);
@@ -199,6 +207,7 @@ public class Server extends Thread{
             ois.close();
             socket.close();
             service.close();
+            console.println("Socket and ServerSocked closed");
         }
     }
     

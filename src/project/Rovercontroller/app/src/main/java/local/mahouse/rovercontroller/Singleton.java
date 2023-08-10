@@ -189,32 +189,36 @@ public class Singleton {
         if(isConnected()) {
             statConnect = null;
 
-            try {
 
-                //La xarxa s'ha de fer servir en un fil different
-                new Thread(() -> {
-                    try {
-                        oos.writeObject(message);
-                    } catch (IOException e) {
-                        statConnect = e;
+                try {
+
+                    //La xarxa s'ha de fer servir en un fil different
+                    new Thread(() -> {
+                        try {
+                            oos.writeObject(message);
+                        } catch (IOException e) {
+                            statConnect = e;
+                        } finally {
+                            lock.notify();
+                        }
+                    }).start();
+
+                    //Si ha fallat l'enviament
+                    if (statConnect != null) {
+                        throw statConnect;
                     }
-                }).start();
+                    return true;
 
-                //Si ha fallat l'enviament
-                if (statConnect != null) {
-                    throw statConnect;
+
+                } catch (IOException e) {
+                    return false;
+
+
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
                 }
-                return true;
 
-
-            } catch (IOException e) {
-                return false;
-
-
-            } catch (Exception e) {
-                throw new RuntimeException(e);
             }
-        }
 
 
         return false;

@@ -1,9 +1,11 @@
 package local.mahouse.rovercontroller;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,6 +25,7 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -35,6 +38,11 @@ public class MainActivity extends AppCompatActivity {
 
     //Inicialitzem el Singleton
     Singleton mSingleton = Singleton.getInstance();
+
+    //Used for setting it's visibility
+    MenuItem shutdown;
+    //Used for setting it's text from the shutdown button
+    MenuItem conDis;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +98,8 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+        shutdown = menu.findItem(R.id.action_shutDown);
+        conDis = menu.findItem(R.id.action_con_dis);
         return true;
     }
 
@@ -110,8 +120,6 @@ public class MainActivity extends AppCompatActivity {
                 //Spaguetti code!!!
                 if(mSingleton.isConnected() == false) {
 
-
-
                     try {
                         //Provem de connectar
                         Exception su;
@@ -122,6 +130,8 @@ public class MainActivity extends AppCompatActivity {
                         item.setTitle(R.string.disconnect_button);
                         Snackbar.make(getWindow().getDecorView(), getText(R.string.connected) + addr,
                                 Snackbar.LENGTH_LONG).show();
+                        shutdown.setVisible(true);
+
 
 
 
@@ -150,6 +160,7 @@ public class MainActivity extends AppCompatActivity {
                     item.setTitle(R.string.connect_button);
                     try {
                         mSingleton.disconnect();
+                        shutdown.setVisible(false);
 
                         Snackbar.make(getWindow().getDecorView(), getText(R.string.disconnected),
                                 Snackbar.LENGTH_LONG).show();
@@ -163,10 +174,60 @@ public class MainActivity extends AppCompatActivity {
 
                 }
                 return true;
+            case R.id.action_shutDown:
+                if(mSingleton.isConnected()) {
+                    //Create confirmation dialog
+                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which){
+                                case DialogInterface.BUTTON_POSITIVE:
+                                    //Yes button clicked
+                                    //Send shutdown request
+                                    mSingleton.sendIt(new int[] {255, 0, 0, 0});
+
+                                    //Wait a little bit so the server recieves that we want to shut it down
+                                    try {
+                                        TimeUnit.MILLISECONDS.sleep(500);
+                                    } catch (InterruptedException e) {
+                                        throw new RuntimeException(e);
+                                    }
+
+                                    //Disconnect application
+                                    conDis.setTitle(R.string.connect_button);
+                                    try {
+                                        mSingleton.disconnect();
+                                        shutdown.setVisible(false);
+                                        Snackbar.make(getWindow().getDecorView(), getText(R.string.disconnected),
+                                                Snackbar.LENGTH_LONG).show();
+                                        //Correm el codi que controla la xarxa en un fil separat
+
+                                    } catch (IOException e) {
+                                        //throw new RuntimeException(e);
+                                        Snackbar.make(getParent().getCurrentFocus(), getText(R.string.error_IOException), BaseTransientBottomBar.LENGTH_LONG)
+                                                .show();
+                                    }
+
+                                    break;
+
+                                case DialogInterface.BUTTON_NEGATIVE:
+                                    //No button clicked
+                                    break;
+                            }
+                        }
+                    };
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage(getText(R.string.confirm_shutdown)).setPositiveButton(getText(R.string.yes), dialogClickListener)
+                            .setNegativeButton(getText(R.string.no), dialogClickListener).show();
+                }
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
+
+
 
 
 }

@@ -30,4 +30,8 @@
     <string name="motor_speed_2">Right Motor Speed</string>
     <string name="deprecated_text">DEPRECATED</string>
     <string name="no_connection_text">Not connected to server</string>
+    <string name="action_shutdown">Shutdown</string>
+    <string name="confirm_shutdown">You sure you want to shutdown the rover?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>
