@@ -21,7 +21,7 @@
                 <configuration>  
                     <archive>  
                         <manifest>  
-                            <mainClass>local.mahouse.multithreadtest.MultithreadTest</mainClass>  
+                            <mainClass>Panels.Frontend</mainClass>  
                         </manifest>  
                     </archive>  
                 </configuration>  
