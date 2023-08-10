@@ -14,4 +14,6 @@ public class Resource {
     
     public static volatile String word = "";
     public static volatile boolean canExit = true;
+    public static volatile int speedLeft = 100;
+    public static volatile int speedRight = 100;
 }

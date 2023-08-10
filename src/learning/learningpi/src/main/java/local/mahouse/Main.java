@@ -144,10 +144,10 @@ public class Main {
         var thePWMB = pi4j.create(PWMBConfig);
         
         //La freqüència per defecte és de 500Hz 
-        thePWMA.on(25, 500);
-        thePWMB.on(25, 500);
+        thePWMA.on(Resource.speedLeft, 500);
+        thePWMB.on(Resource.speedRight, 500);
         
-        //LA duració del cicle per defecte és de 50%
+        //LA duració del cicle per defecte és de 100%
         
         //Funcions
         class Movement {
@@ -156,39 +156,53 @@ public class Main {
                 them2.high();
                 them3.low();
                 them4.high();
+                
+                this.speed(Resource.speedLeft, Resource.speedRight);
                 console.println("Reverse", this);
+                console.println("Speed is (left | right): " + String.valueOf(Resource.speedLeft)
+                        + "% | " + String.valueOf(Resource.speedRight) + "%");
             }
             void forward() {
                 them1.high();
                 them2.low();
                 them3.high();
                 them4.low();
+                this.speed(Resource.speedLeft, Resource.speedRight);
                 console.println("Forward", this);
+                console.println("Speed is (left | right): " + String.valueOf(Resource.speedLeft) 
+                        + "% | " + String.valueOf(Resource.speedRight) + "%");
             }
             void left() {
                 them1.high();
                 them2.low();
                 them3.low();
                 them4.high();
+                this.speed(Resource.speedLeft, Resource.speedRight);
                 console.println("Left", this);
+                console.println("Speed is (left | right): " + String.valueOf(Resource.speedLeft) 
+                        + "% | " + String.valueOf(Resource.speedRight) + "%");
             }
             void right() {
                 them1.low();
                 them2.high();
                 them3.high();
                 them4.low();
+                this.speed(Resource.speedLeft, Resource.speedRight);
                 console.println("Right", this);
+                console.println("Speed is (left | right): " + String.valueOf(Resource.speedLeft) 
+                        + "% | " + String.valueOf(Resource.speedRight) + "%");
             }
             void stop() {
                 them1.low();
                 them2.low();
                 them3.low();
                 them4.low();
+                this.speed(0, 0);
                 console.println("Stop", this);
             }
-            void speed(Number speed) {
-              thePWMA.on(speed, 500);
-              thePWMB.on(speed, 500);
+            void speed(Number speedLeft, Number speedRight) {
+              thePWMA.on(speedLeft, 500);
+              thePWMB.on(speedRight, 500);
             }
         }
         
@@ -229,12 +243,7 @@ public class Main {
                     move.stop();
                     break;
                 case "speed":
-                    Resource.canExit = false;
-                    System.out.print("What speed (%)? (0 - 100): ");
-                    Resource.word = ""; 
-                    while(Resource.word.equals("")) {}
-                    imSpeed = Integer.parseInt(Resource.word);
-                    move.speed(imSpeed);
+                    console.println("SPEED CASE IS DEPRECADED", this);
                     break;
                 case "quit":
                     move.stop();

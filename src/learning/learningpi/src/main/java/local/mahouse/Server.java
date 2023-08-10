@@ -158,6 +158,8 @@ public class Server extends Thread{
                         oos.reset(); */
                         
                         //TODO: Processar dades de velocitat 
+                        Resource.speedLeft = data[2];
+                        Resource.speedRight = data[3];
                         
                         break;
                         

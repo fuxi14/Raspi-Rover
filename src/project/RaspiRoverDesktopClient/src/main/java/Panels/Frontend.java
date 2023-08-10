@@ -193,8 +193,8 @@ public class Frontend extends javax.swing.JFrame {
         data[0] = 1;
         data[1] = 2;
         //Speed
-        data[2] = jSlider1.getExtent();
-        data[3] = jSlider1.getExtent();
+        data[2] = jSlider1.getValue();
+        data[3] = jSlider1.getValue();
 
         RaspiRoverDesktopClient.sendIt(data);
 
@@ -206,8 +206,8 @@ public class Frontend extends javax.swing.JFrame {
         data[0] = 1;
         data[1] = 4;
         //Speed
-        data[2] = jSlider1.getExtent();
-        data[3] = jSlider1.getExtent();
+        data[2] = jSlider1.getValue();
+        data[3] = jSlider1.getValue();
 
         RaspiRoverDesktopClient.sendIt(data);
     }//GEN-LAST:event_jButton3ActionPerformed
@@ -274,8 +274,8 @@ public class Frontend extends javax.swing.JFrame {
         data[0] = 1;
         data[1] = 0;
         //Speed
-        data[2] = jSlider1.getExtent();
-        data[3] = jSlider1.getExtent();
+        data[2] = jSlider1.getValue();
+        data[3] = jSlider1.getValue();
 
         RaspiRoverDesktopClient.sendIt(data);
     }//GEN-LAST:event_jButton6ActionPerformed
@@ -286,8 +286,8 @@ public class Frontend extends javax.swing.JFrame {
         data[0] = 1;
         data[1] = 1;
         //Speed
-        data[2] = jSlider1.getExtent();
-        data[3] = jSlider1.getExtent();
+        data[2] = jSlider1.getValue();
+        data[3] = jSlider1.getValue();
 
         RaspiRoverDesktopClient.sendIt(data);
     }//GEN-LAST:event_jButton2ActionPerformed
@@ -298,8 +298,8 @@ public class Frontend extends javax.swing.JFrame {
         data[0] = 1;
         data[1] = 3;
         //Speed
-        data[2] = jSlider1.getExtent();
-        data[3] = jSlider1.getExtent();
+        data[2] = jSlider1.getValue();
+        data[3] = jSlider1.getValue();
 
         RaspiRoverDesktopClient.sendIt(data);
     }//GEN-LAST:event_jButton4ActionPerformed
