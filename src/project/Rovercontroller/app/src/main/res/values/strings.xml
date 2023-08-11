@@ -34,4 +34,17 @@
     <string name="confirm_shutdown">You sure you want to shutdown the rover?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="controller">Controller</string>
+    <string name="power">Power</string>
+    <string name="angle">Angle</string>
+    <string name="direction">Direction</string>
+    <string name="front_lab">Front</string>
+    <string name="front_right_lab">Front Right</string>
+    <string name="right_lab">Right</string>
+    <string name="right_bottom_lab">Right Bottom</string>
+    <string name="bottom_lab">Bottom</string>
+    <string name="bottom_left_lab">Bottom Left</string>
+    <string name="left_lab">Left</string>
+    <string name="left_front_lab">Left Front</string>
+    <string name="center_lab">Center</string>
 </resources>
