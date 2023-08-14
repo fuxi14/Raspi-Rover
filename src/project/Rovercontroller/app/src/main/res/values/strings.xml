@@ -47,4 +47,8 @@
     <string name="left_lab">Left</string>
     <string name="left_front_lab">Left Front</string>
     <string name="center_lab">Center</string>
+    <string name="left_power">Left Power</string>
+    <string name="right_power">Right Power</string>
+    <string name="offline_enabled">Offline debugging enabled</string>
+    <string name="offline_disabled">Offline debugging disabled</string>
 </resources>

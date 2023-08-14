@@ -18,9 +18,11 @@ import local.mahouse.rovercontroller.Singleton;
 
 public class GalleryFragment extends Fragment {
 
-    private TextView mAngle, mPower, mDirection;
+    private TextView mAngle, mPower, mDirection, mLeftPower, mRightPower;
     private int[] data = new int[4];
     private JoystickView joystick;
+
+    private boolean canOffline = false;
 
 
 
@@ -31,16 +33,19 @@ public class GalleryFragment extends Fragment {
         mAngle = (TextView) galleryFragment.findViewById(R.id.txtAngle);
         mPower = (TextView) galleryFragment.findViewById(R.id.txtPower);
         mDirection = (TextView) galleryFragment.findViewById(R.id.txtDirection);
+        mLeftPower = (TextView) galleryFragment.findViewById(R.id.txtLeftPower);
+        mRightPower = (TextView) galleryFragment.findViewById(R.id.txtRightPower);
         //JoystickView is a module created by @alvesoaj on Github, all rights reserved to him
         //His github: https://github.com/alvesoaj/JoystickView
         joystick = (JoystickView) galleryFragment.findViewById(R.id.joystickControll);
 
         //Event listener that always returns the variation of the angle in degrees, motion power in percentage and direction of movement
         joystick.setOnJoystickMoveListener(new OnJoystickMoveListener() {
-
             @Override
             public void onValueChanged(int angle, int power, int direction) {
-                if(Singleton.isConnected()) {
+
+                if(Singleton.isConnected() || canOffline) {//Fem funcionar el Joystick tan si està connectat com si s'ha habilitat el debugging
+                //if(true) {//For testing purposes
                     data[0] = 1; //We move
 
                     mAngle.setText(" " + String.valueOf(angle) + "°");
@@ -84,36 +89,77 @@ public class GalleryFragment extends Fragment {
                     //Let's use the power of  M A T H
 
                     //S'HA DE TENIR EN COMPTE QUE EL 0 MIRA CAP AMUNT
-                    if(0 < angle && angle < 45) { //Davant-dreta
+                    if(0 < angle && angle <= 45) { //Davant-dreta
                         //Forward Right
                         data[1] = 1;
                         data[2] = power;
-                        data[3] = 100 * (int) Math.cos(angle * 2);
-                    } else if (45 <= angle && angle < 90) { //Dreta
+                        data[3] = (int) ( power * Math.cos((angle * 2) * (2 * Math.PI / 360)));
+                    } else if (45 < angle && angle <= 90) { //Dreta
                         data[1] = 4;
                         data[2] = power;
-                        data[3] = power * (int) Math.sin(angle * 2);
+                        data[3] = (int) (power * - Math.cos((angle * 2) * (2 * Math.PI / 360)));
 
-                    } else if (90 <= angle && angle < 135) { //Dreta
+                    } else if (90 < angle && angle <= 135) { //Dreta
                         data[1] = 4;
-                        data[2] = power * (int)  Math.sin(angle * 2);
+                        data[2] = (int) (power *  - Math.cos((angle * 2) * (2 * Math.PI / 360)));
                         data[3] = power;
-                    } else if (135 <= angle && angle <= 180) { //Dreta - avall
+                    } else if (135 < angle && angle <= 180) { //Dreta - avall
                         data[1] = 2;
-                        data[2] = power * (int) - Math.cos(angle * 2);
+                        data[2] = (int) (power * Math.cos((angle * 2) * (2 * Math.PI / 360)));
                         data[3] = power;
-                    } else if (-180 <= angle && angle < -135) {
+                    } else if (-180 < angle && angle < -135) {
                         data[1] = 2;
+                        data[2] = power;
+                        data[3] = (int) (power * Math.cos((angle * 2) * (2 * Math.PI / 360)));
+                    } else if (-135 < angle && angle < -90) {
+                        data[1] = 3;
+                        data[2] = power;
+                        data[3] = (int) (power * - Math.cos((angle * 2) * (2 * Math.PI / 360)));
+                    } else if (-90 < angle && angle < -45) {
+                        data[1] = 3;
+                        data[2] = (int) (power * - Math.cos((angle * 2) * (2 * Math.PI / 360)));
+                        data[3] = power;
+                    } else if (-45 < angle && angle < 0) {
+                        data[1] = 1;
+                        data[2] = (int) (power * Math.cos((angle * 2) * (2 * Math.PI / 360)));
+                        data[3] = power;
+                    }
 
-                        //TODO: Acabar procesament de l'angle i velocitat
+                    mLeftPower.setText(String.valueOf(data[2]));
+                    mRightPower.setText(String.valueOf(data[3]));
+                    System.out.println("Angle: " + String.valueOf((angle * 2) * (2 * Math.PI / 360)));
+                    System.out.println("Cosinus: " + String.valueOf(Math.cos((angle * 2) * (2 * Math.PI / 360))));
+
+                    //Enviem dades si no estem offline
+                    if (Singleton.isConnected()) {
+                        //TODO: Send data
                     }
 
                 } else {
 
                 }
+
+
             }
         }, JoystickView.DEFAULT_LOOP_INTERVAL);
 
+
+        //Si es prémen les etiquetes de direcció o angle activa o desactiva test del Joystick sense connexió
+        mDirection.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                canOffline = true;
+                Toast.makeText(getContext(), getText(R.string.offline_enabled), Toast.LENGTH_LONG).show();
+            }
+        });
+
+        mAngle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                canOffline = false;
+                Toast.makeText(getContext(), getText(R.string.offline_disabled), Toast.LENGTH_LONG).show();
+            }
+        });
 
         return galleryFragment;
     }
