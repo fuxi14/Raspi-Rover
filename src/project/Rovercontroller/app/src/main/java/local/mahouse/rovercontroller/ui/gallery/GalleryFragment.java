@@ -89,7 +89,7 @@ public class GalleryFragment extends Fragment {
                     //Let's use the power of  M A T H
 
                     //S'HA DE TENIR EN COMPTE QUE EL 0 MIRA CAP AMUNT
-                    if(0 < angle && angle <= 45) { //Davant-dreta
+                    if(0 <= angle && angle <= 45) { //Davant-dreta
                         //Forward Right
                         data[1] = 1;
                         data[2] = power;
@@ -123,7 +123,12 @@ public class GalleryFragment extends Fragment {
                         data[1] = 1;
                         data[2] = (int) (power * Math.cos((angle * 2) * (2 * Math.PI / 360)));
                         data[3] = power;
+                    } if (power == 0) {
+                        data[1] = 0;
+                        data[2] = 0;
+                        data[3] = 0;
                     }
+
 
                     mLeftPower.setText(String.valueOf(data[2]));
                     mRightPower.setText(String.valueOf(data[3]));
@@ -132,7 +137,13 @@ public class GalleryFragment extends Fragment {
 
                     //Enviem dades si no estem offline
                     if (Singleton.isConnected()) {
-                        //TODO: Send data
+                        if (power == 0) {
+                            data[1] = 0;
+                            data[2] = 0;
+                            data[3] = 0;
+                        }
+                        Singleton.sendIt(data);
+
                     }
 
                 } else {
