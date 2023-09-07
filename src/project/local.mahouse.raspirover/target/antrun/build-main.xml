@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="maven-antrun-" default="main">
+  <target name="main">
+    <property name="local.dist.dir" value="/home/nuria/Documents/Escola/TR/Raspi-Rover/src/project/local.mahouse.raspirover/target" />
+    <property name="remote.runtime.encoding" value="UTF-8" />
+    <property name="dist.jar.name" value="piroversoft" />
+    <ant antfile="antrun/build.xml" target="build-remote" />
+  </target>
+</project>

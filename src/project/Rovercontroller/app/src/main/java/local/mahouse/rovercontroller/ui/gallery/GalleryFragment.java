@@ -13,6 +13,8 @@ import android.widget.Toast;
 import com.zerokol.views.joystickView.JoystickView;
 import com.zerokol.views.joystickView.JoystickView.*;
 
+import java.util.Arrays;
+
 import local.mahouse.rovercontroller.R;
 import local.mahouse.rovercontroller.Singleton;
 
@@ -95,12 +97,12 @@ public class GalleryFragment extends Fragment {
                         data[2] = power;
                         data[3] = (int) ( power * Math.cos((angle * 2) * (2 * Math.PI / 360)));
                     } else if (45 < angle && angle <= 90) { //Dreta
-                        data[1] = 4;
+                        data[1] = 3;
                         data[2] = power;
                         data[3] = (int) (power * - Math.cos((angle * 2) * (2 * Math.PI / 360)));
 
                     } else if (90 < angle && angle <= 135) { //Dreta
-                        data[1] = 4;
+                        data[1] = 3;
                         data[2] = (int) (power *  - Math.cos((angle * 2) * (2 * Math.PI / 360)));
                         data[3] = power;
                     } else if (135 < angle && angle <= 180) { //Dreta - avall
@@ -112,11 +114,11 @@ public class GalleryFragment extends Fragment {
                         data[2] = power;
                         data[3] = (int) (power * Math.cos((angle * 2) * (2 * Math.PI / 360)));
                     } else if (-135 < angle && angle < -90) {
-                        data[1] = 3;
+                        data[1] = 4;
                         data[2] = power;
                         data[3] = (int) (power * - Math.cos((angle * 2) * (2 * Math.PI / 360)));
                     } else if (-90 < angle && angle < -45) {
-                        data[1] = 3;
+                        data[1] = 4;
                         data[2] = (int) (power * - Math.cos((angle * 2) * (2 * Math.PI / 360)));
                         data[3] = power;
                     } else if (-45 < angle && angle < 0) {
@@ -141,7 +143,9 @@ public class GalleryFragment extends Fragment {
                             data[1] = 0;
                             data[2] = 0;
                             data[3] = 0;
+                            System.out.println("Stop the rover");
                         }
+                        System.out.println("Data being sent: " + Arrays.toString(data));
                         Singleton.sendIt(data);
 
                     }

@@ -5,6 +5,9 @@ module local.mahouse.learningpi {
     requires com.pi4j.plugin.raspberrypi;
     requires com.pi4j.plugin.pigpio;
     requires com.pi4j.library.pigpio;
+    
+    requires java.logging;
+
 
     uses com.pi4j.extension.Extension;
     uses com.pi4j.provider.Provider;

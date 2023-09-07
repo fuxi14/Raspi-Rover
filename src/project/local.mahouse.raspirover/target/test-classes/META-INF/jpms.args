@@ -1,0 +1,4 @@
+--patch-module
+local.mahouse.learningpi=_
+--add-reads
+local.mahouse.learningpi=ALL-UNNAMED

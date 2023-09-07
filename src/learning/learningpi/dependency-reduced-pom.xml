@@ -4,7 +4,7 @@
   <groupId>local.mahouse</groupId>
   <artifactId>learningpi</artifactId>
   <name>Learning Pi</name>
-  <version>0.4.3</version>
+  <version>0.4.4</version>
   <build>
     <finalName>${project.artifactId}</finalName>
     <plugins>

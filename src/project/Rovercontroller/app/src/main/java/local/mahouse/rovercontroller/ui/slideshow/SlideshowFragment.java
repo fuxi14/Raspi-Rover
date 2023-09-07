@@ -159,7 +159,7 @@ public class SlideshowFragment extends Fragment {
 
                         //Control manual: Girar Esquerre
                         data[0] = 1;
-                        data[1] = 3;
+                        data[1] = 4;
                         //Speed
                         data[2] = speedLeft.getProgress();
                         data[3] = speedRight.getProgress();
@@ -201,7 +201,7 @@ public class SlideshowFragment extends Fragment {
 
                         //Control manual: Girar Dreta
                         data[0] = 1;
-                        data[1] = 4;
+                        data[1] = 3;
                         //Speed
                         data[2] = speedLeft.getProgress();
                         data[3] = speedRight.getProgress();
