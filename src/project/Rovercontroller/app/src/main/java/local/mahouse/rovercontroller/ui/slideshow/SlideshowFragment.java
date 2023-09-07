@@ -59,8 +59,7 @@ public class SlideshowFragment extends Fragment {
         ImageButton btnRight = (ImageButton) slideshowFragment.findViewById(R.id.btnRight);
 
         //Velocitat motors
-        SeekBar speedLeft = (SeekBar) slideshowFragment.findViewById(R.id.speed1);
-        SeekBar speedRight = (SeekBar) slideshowFragment.findViewById(R.id.speed2);
+        SeekBar speed = (SeekBar) slideshowFragment.findViewById(R.id.speed);
 
 
 
@@ -76,8 +75,8 @@ public class SlideshowFragment extends Fragment {
                         data[0] = 1;
                         data[1] = 1;
                         //Speed
-                        data[2] = speedLeft.getProgress();
-                        data[3] = speedRight.getProgress();
+                        data[2] = speed.getProgress();
+                        data[3] = speed.getProgress();
 
                         Singleton.sendIt(data);
 
@@ -118,8 +117,8 @@ public class SlideshowFragment extends Fragment {
                         data[0] = 1;
                         data[1] = 2;
                         //Speed
-                        data[2] = speedLeft.getProgress();
-                        data[3] = speedRight.getProgress();
+                        data[2] = speed.getProgress();
+                        data[3] = speed.getProgress();
 
                         Singleton.sendIt(data);
 
@@ -161,8 +160,8 @@ public class SlideshowFragment extends Fragment {
                         data[0] = 1;
                         data[1] = 4;
                         //Speed
-                        data[2] = speedLeft.getProgress();
-                        data[3] = speedRight.getProgress();
+                        data[2] = speed.getProgress();
+                        data[3] = speed.getProgress();
 
                         Singleton.sendIt(data);
 
@@ -203,8 +202,8 @@ public class SlideshowFragment extends Fragment {
                         data[0] = 1;
                         data[1] = 3;
                         //Speed
-                        data[2] = speedLeft.getProgress();
-                        data[3] = speedRight.getProgress();
+                        data[2] = speed.getProgress();
+                        data[3] = speed.getProgress();
 
                         Singleton.sendIt(data);
 

@@ -51,4 +51,5 @@
     <string name="offline_enabled">Depuració sense conexió activada</string>
     <string name="offline_disabled">Depuració sense conexió desactivada</string>
     <string name="replace_with_action">Reemplaçar amb la teva pròpia acció</string>
+    <string name="motor_speed">Velocitat</string>
 </resources>
