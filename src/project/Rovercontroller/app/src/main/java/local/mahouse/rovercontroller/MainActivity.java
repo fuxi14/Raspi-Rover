@@ -1,8 +1,11 @@
 package local.mahouse.rovercontroller;
 
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
@@ -20,6 +23,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -49,26 +53,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main); //M'ho havia deixat, F
 
-        //Still cannot be implemented
-        /*Thread fallback = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                //Observem si estem connectats i si el fil que escolta ha mort
-                if(mSingleton.isConnected()) {
-                    if(!mSingleton.listener.isAlive()) {
-
-                    }
-                }
-
-            }
-        });*/
 
         //Inicialitzem la barra d'eines i el botó flotant
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         setSupportActionBar(toolbar);
-        
-
 
 
         fab.setOnClickListener(new View.OnClickListener() {
@@ -222,11 +211,16 @@ public class MainActivity extends AppCompatActivity {
                             .setNegativeButton(getText(R.string.no), dialogClickListener).show();
                 }
                 return true;
+
+            case R.id.action_settings:
+                //Iniciem acivitat de configuració
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
-
 
 
 

@@ -53,4 +53,12 @@
     <string name="offline_disabled">Offline debugging disabled</string>
     <string name="replace_with_action">Replace with your own action</string>
     <string name="motor_speed">Speed</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="preferences">App preferences</string>
+    <string name="title_offline_preference">Offline mode</string>
+    <string name="summary_offline_preference">Allow joystick to function without connecting to robot</string>
+    <string name="title_IP_preference">Robot IP address</string>
+    <string name="summary_IP_preferance">Default IP address of the robot</string>
+    <string name="error_generic">Something failed</string>
+    <string name="text_joystick_not_enabled">Joystick not enabled: No connection or no Offline Mode</string>
 </resources>

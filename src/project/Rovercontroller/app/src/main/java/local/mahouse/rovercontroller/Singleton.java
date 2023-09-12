@@ -1,6 +1,8 @@
 package local.mahouse.rovercontroller;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.Toast;
@@ -257,6 +259,45 @@ public class Singleton {
         }
 
         return false;
+    }
+
+    //Per guardar i aplicar configuració guardada
+    public String getPreferenceValue(Context context, String preferance)
+    {
+        String str = "ERROR";
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        try {
+            str = sp.getString(preferance, "");
+        } catch (Exception e) {
+            Toast.makeText(context, context.getText(R.string.error_generic), Toast.LENGTH_LONG).show();
+            //SharedPreferences sp = context.getSharedPreferences(myPref, 0);
+
+        } finally {
+            return str;
+        }
+    }
+
+    public boolean getBooleanPreferenceValue(Context context, String preferance)
+    {
+        boolean data = false;
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        try {
+            data = sp.getBoolean(preferance, false);
+        } catch (Exception e) {
+            Toast.makeText(context, context.getText(R.string.error_generic), Toast.LENGTH_LONG).show();
+            //SharedPreferences sp = context.getSharedPreferences(myPref, 0);
+
+        } finally {
+            return data;
+        }
+    }
+
+
+    public void writeToPreference(Context context, String preferance, String thePreference)
+    {
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+        editor.putString(preferance, thePreference);
+        editor.commit();
     }
 
 }

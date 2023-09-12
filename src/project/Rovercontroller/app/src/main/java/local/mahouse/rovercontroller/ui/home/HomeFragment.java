@@ -11,13 +11,17 @@ import android.widget.TextView;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.arch.lifecycle.ViewModelProvider;
+import android.widget.Toast;
 
 import local.mahouse.rovercontroller.R;
 import local.mahouse.rovercontroller.Singleton;
 
 public class HomeFragment extends Fragment {
 
+    Singleton mSingleton = Singleton.getInstance();
     static EditText enterIP = null;
+    //We need to set the saved IP setting for the robot
+    EditText mIPAddress;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -27,6 +31,17 @@ public class HomeFragment extends Fragment {
         //Inicialitzem les vistes
         enterIP = homeFragment.findViewById(R.id.editTextIPAddress);
 
+
+        mIPAddress = (EditText) homeFragment.findViewById(R.id.editTextIPAddress);
+
+        String IP = mSingleton.getPreferenceValue(getContext(), "robot_ip_address");
+        System.out.println("Got: " + IP);
+
+        try {
+            mIPAddress.setText(IP);
+        } catch (NullPointerException e){
+            Toast.makeText(getContext(), getText(R.string.error_generic), Toast.LENGTH_SHORT).show();
+        }
 
         //Escoltem si es clica el botó i fem acció
 

@@ -52,4 +52,11 @@
     <string name="offline_disabled">Depuració sense conexió desactivada</string>
     <string name="replace_with_action">Reemplaçar amb la teva pròpia acció</string>
     <string name="motor_speed">Velocitat</string>
+    <string name="preferences">Configuració de l\'aplicació</string>
+    <string name="title_offline_preference">Mode sense connexió</string>
+    <string name="summary_offline_preference">Permetre funcionament del joystick sense connectar amb el ròver</string>
+    <string name="summary_IP_preferance">Adreça IP per defecte del robot</string>
+    <string name="title_IP_preference">Adreça IP robot</string>
+    <string name="error_generic">Alguna cosa ha fallat</string>
+    <string name="text_joystick_not_enabled">Joystick no habilitat: No hi ha connexió o el mode sense connexió està deshabilitat</string>
 </resources>

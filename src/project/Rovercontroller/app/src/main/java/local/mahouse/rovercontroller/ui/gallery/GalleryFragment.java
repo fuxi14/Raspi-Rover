@@ -24,8 +24,7 @@ public class GalleryFragment extends Fragment {
     private int[] data = new int[4];
     private JoystickView joystick;
 
-    private boolean canOffline = false;
-
+    private Singleton mSingleton = Singleton.getInstance();
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -46,8 +45,8 @@ public class GalleryFragment extends Fragment {
             @Override
             public void onValueChanged(int angle, int power, int direction) {
 
-                if(Singleton.isConnected() || canOffline) {//Fem funcionar el Joystick tan si està connectat com si s'ha habilitat el debugging
-                //if(true) {//For testing purposes
+                if(Singleton.isConnected() || mSingleton.getBooleanPreferenceValue(getContext(), "offline_preference")) {//Fem funcionar el Joystick tan si està connectat com si s'ha habilitat el debugging
+                    //if(true) {//For testing purposes
                     data[0] = 1; //We move
 
                     mAngle.setText(" " + String.valueOf(angle) + "°");
@@ -91,19 +90,19 @@ public class GalleryFragment extends Fragment {
                     //Let's use the power of  M A T H
 
                     //S'HA DE TENIR EN COMPTE QUE EL 0 MIRA CAP AMUNT
-                    if(0 <= angle && angle <= 45) { //Davant-dreta
+                    if (0 <= angle && angle <= 45) { //Davant-dreta
                         //Forward Right
                         data[1] = 1;
                         data[2] = power;
-                        data[3] = (int) ( power * Math.cos((angle * 2) * (2 * Math.PI / 360)));
+                        data[3] = (int) (power * Math.cos((angle * 2) * (2 * Math.PI / 360)));
                     } else if (45 < angle && angle <= 90) { //Dreta
                         data[1] = 3;
                         data[2] = power;
-                        data[3] = (int) (power * - Math.cos((angle * 2) * (2 * Math.PI / 360)));
+                        data[3] = (int) (power * -Math.cos((angle * 2) * (2 * Math.PI / 360)));
 
                     } else if (90 < angle && angle <= 135) { //Dreta
                         data[1] = 3;
-                        data[2] = (int) (power *  - Math.cos((angle * 2) * (2 * Math.PI / 360)));
+                        data[2] = (int) (power * -Math.cos((angle * 2) * (2 * Math.PI / 360)));
                         data[3] = power;
                     } else if (135 < angle && angle <= 180) { //Dreta - avall
                         data[1] = 2;
@@ -116,16 +115,17 @@ public class GalleryFragment extends Fragment {
                     } else if (-135 < angle && angle < -90) {
                         data[1] = 4;
                         data[2] = power;
-                        data[3] = (int) (power * - Math.cos((angle * 2) * (2 * Math.PI / 360)));
+                        data[3] = (int) (power * -Math.cos((angle * 2) * (2 * Math.PI / 360)));
                     } else if (-90 < angle && angle < -45) {
                         data[1] = 4;
-                        data[2] = (int) (power * - Math.cos((angle * 2) * (2 * Math.PI / 360)));
+                        data[2] = (int) (power * -Math.cos((angle * 2) * (2 * Math.PI / 360)));
                         data[3] = power;
                     } else if (-45 < angle && angle < 0) {
                         data[1] = 1;
                         data[2] = (int) (power * Math.cos((angle * 2) * (2 * Math.PI / 360)));
                         data[3] = power;
-                    } if (power == 0) {
+                    }
+                    if (power == 0) {
                         data[1] = 0;
                         data[2] = 0;
                         data[3] = 0;
@@ -150,16 +150,24 @@ public class GalleryFragment extends Fragment {
 
                     }
 
-                } else {
-
                 }
 
 
             }
         }, JoystickView.DEFAULT_LOOP_INTERVAL);
 
+        //Mirem si s'ha habilitat el joystick o no
+        joystick.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!Singleton.isConnected() || !mSingleton.getBooleanPreferenceValue(getContext(), "offline_preference")) {
+                    Toast.makeText(getContext(), getText(R.string.no_connection_text), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
         //Si es prémen les etiquetes de direcció o angle activa o desactiva test del Joystick sense connexió
+        /* -------------------- DEPRECATED ------------------------
         mDirection.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -175,6 +183,7 @@ public class GalleryFragment extends Fragment {
                 Toast.makeText(getContext(), getText(R.string.offline_disabled), Toast.LENGTH_LONG).show();
             }
         });
+        */
 
         return galleryFragment;
     }
