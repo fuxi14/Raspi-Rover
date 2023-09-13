@@ -1,7 +1,12 @@
 package local.mahouse.rovercontroller;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.view.View;
@@ -12,11 +17,15 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ConnectException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.NoRouteToHostException;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+
+import local.mahouse.rovercontroller.ui.home.HomeFragment;
 
 public class Singleton {
 
@@ -28,29 +37,31 @@ public class Singleton {
     private static boolean bufferEmpty = true;
     private static boolean stringBufferEmpty = true;
     public static ArrayList<String> messages = new ArrayList<String>();
-    private static String addr;
+    private static String mAddr;
     public static String mMessage;
     static Exception statConnect = null;
 
-    static byte[] sendData = new byte[4]; //Data that we send to the server
-    private static byte[] recievedData = new byte[4]; //Data that we recieve from the server
+    private static int[] recievedData = new int[4]; //Data that we recieve from the server
 
     static Object lock = new Object(); //Use to notify the main thread to continue
 
-
+    //Per poder trobar l'adreça
+    static volatile boolean searching;
+    static volatile String foundAddress = "NONE";
 
     //Creem un fil que connecta amb el server i escolta missatges que vénen del servidor
     public static final Runnable listener = new Runnable() {
 
         //Algunes variables del fil
-        byte[] localData;
+        int[] localData = new int[4];
         @Override
         public void run() {
             //Connecció
             //Sé que no gestiono els errors, és expressament
             synchronized (Singleton.lock) {
                 try {
-                    host = InetAddress.getByName(addr);
+
+                    host = InetAddress.getByName(mAddr);
                     socket = new Socket(host.getHostName(), 9876);
                     oos = new ObjectOutputStream(socket.getOutputStream());
                     ois = new ObjectInputStream(socket.getInputStream());
@@ -58,10 +69,13 @@ public class Singleton {
                     Singleton.statConnect = null; //Ens assegurem que no reportem cap error
                 } catch (UnknownHostException e) {
                     Singleton.statConnect = e; //Per enviar l'error a la MainActivity
+                    e.printStackTrace();
                 } catch (ConnectException e) {
                     Singleton.statConnect = e;
+                    e.printStackTrace();
                 } catch (IOException e) {
                     Singleton.statConnect = e;
+                    e.printStackTrace();
                 } finally {
                     System.out.println("[Thread] And we notify main thread");
                     Singleton.lock.notify();
@@ -74,14 +88,15 @@ public class Singleton {
                 try {
 
                     //We read the data
-                    localData = (byte[]) ois.readObject();
+                    localData = (int[]) ois.readObject();
                     Singleton.setRecievedData(localData);
                     //Processem les dades
-                    if(localData[0] == 0x04) {
+                    // -------------------- OBSOLET --------------------
+                    /*if(localData[0] == 0x04) {
                         if(localData[1] != (byte) 0xEE) {//Si no hi ha hagut un error en el server
                             Singleton.setBufferEmpty(false);
                         }
-                    }
+                    }*/
                     /*
                     //DEPRECATED FOR NOW
                     mMessage = ois.readObject().toString();
@@ -138,12 +153,13 @@ public class Singleton {
     }
 
 
-    public static byte[] getRecievedData() {
+    public static int[] getRecievedData() {
         return recievedData;
     }
 
-    public static void setRecievedData(byte[] recievedData) {
+    public static void setRecievedData(int[] recievedData) {
         Singleton.recievedData = recievedData;
+        Singleton.setBufferEmpty(false);
     }
 
     public static boolean isStringBufferEmpty() {
@@ -159,7 +175,7 @@ public class Singleton {
 
     public Exception connect(String addr) {
 
-        this.addr = addr;
+        mAddr = addr;
 
         //Start listener thread
         new Thread(listener, "listener").start();
@@ -260,6 +276,119 @@ public class Singleton {
 
         return false;
     }
+
+    //Mètode per trovar l'adreça IP del robot
+    //Basat en: https://stackoverflow.com/a/28819552
+    public static void searchThread(ProgressDialog progress, Context context, int startAddr, int endAddr, int timeout) {
+        int i = startAddr;
+        String iIPv4;
+        while(searching && i <= endAddr) {
+            iIPv4 = "192.168.1." + i;
+            System.out.println("TESTING: " + iIPv4);
+
+            try {
+                // First check if IP is reachable at all.
+                InetAddress ip = InetAddress.getByName(iIPv4);
+                if (!ip.isReachable(timeout)) {
+                    //System.out.println(iIPv4 + " is not reachable...");
+
+                    //It was FUCKING THIS that prevented this shit to work
+                    progress.incrementProgressBy(1);
+                } else {
+                    // Address is reachable -> try connecting to socket.
+                    Socket socket = new Socket();
+                    SocketAddress address = new InetSocketAddress(ip, 9876);
+                    socket.connect(address, timeout);
+                    System.out.println(iIPv4 + " has a ServerSocket running...");
+                    foundAddress = iIPv4;
+                    searching = false; //Will be removed when checking is implemented
+
+                    //ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+                    //ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+
+                    //We still can't use thi
+                    //TODO: Implement server checking here and on Raspberry software
+                /*
+                //This is the packet that we sent to check whether we are talking to the robot or not
+                oos.writeObject(new int[] {128, 3, 4, 5});
+
+                try {
+                    recievedData = (int[]) ois.readObject();
+                } catch (ClassNotFoundException e) {
+                    System.out.println(iIPv4 + " isn't what we are looking for...");
+                } */
+
+
+                    System.out.println("We get to where we close the thread");
+
+                    final String theChosenOne = iIPv4;
+                    Activity activity = (Activity) context;
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            HomeFragment.setEnterIP(theChosenOne); //We set the found IP
+                            progress.dismiss();
+                            //TODO: Send notification when is done searching
+                            //TODO: Automatically save found IP to settings
+                        }
+                    });
+
+
+
+                    socket.close();
+                    //in.close();
+                    //out.close();
+                }
+
+
+
+            } catch (UnknownHostException e) {
+            } catch (IOException e) {
+            }
+            if(foundAddress != "NONE") {
+                searching = false;
+            } else {
+                i++;
+            }
+        }
+        System.out.println("Thread closed");
+    }
+
+    public void searchAddress(ProgressDialog progress, Context context, int timeout) {
+        searching = true;
+
+        Thread t1 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Singleton.searchThread(progress, context, 2, 64, 1000);
+            }
+        });
+        Thread t2 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Singleton.searchThread(progress, context, 65, 128, 1000);
+            }
+        });
+        Thread t3 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Singleton.searchThread(progress, context, 129, 194, 1000);
+            }
+        });
+        Thread t4 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Singleton.searchThread(progress, context, 195, 255, 1000);
+            }
+        });
+
+        t1.start();
+        t2.start();
+        t3.start();
+        t4.start();
+
+    }
+
 
     //Per guardar i aplicar configuració guardada
     public String getPreferenceValue(Context context, String preferance)

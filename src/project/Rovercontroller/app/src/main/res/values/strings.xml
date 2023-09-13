@@ -61,4 +61,8 @@
     <string name="summary_IP_preferance">Default IP address of the robot</string>
     <string name="error_generic">Something failed</string>
     <string name="text_joystick_not_enabled">Joystick not enabled: No connection or no Offline Mode</string>
+    <string name="action_search">Search</string>
+    <string name="confirm_search">Do you want to start searching for the robot IP Address?</string>
+    <string name="in_search">This may take a while...</string>
+    <string name="title_in_search">Searching</string>
 </resources>

@@ -1,5 +1,7 @@
 package local.mahouse.rovercontroller;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -45,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Used for setting it's visibility
     MenuItem shutdown;
+    MenuItem search;
     //Used for setting it's text from the shutdown button
     MenuItem conDis;
 
@@ -88,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         shutdown = menu.findItem(R.id.action_shutDown);
+        search = menu.findItem(R.id.action_search);
         conDis = menu.findItem(R.id.action_con_dis);
         return true;
     }
@@ -105,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_con_dis:
 
                 String addr = HomeFragment.getIPText(); //Un fil separat no pot tocar les vistes d'un altre fil (main)
-
+                System.out.println(addr);
                 //Spaguetti code!!!
                 if(mSingleton.isConnected() == false) {
 
@@ -120,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
                         Snackbar.make(getWindow().getDecorView(), getText(R.string.connected) + addr,
                                 Snackbar.LENGTH_LONG).show();
                         shutdown.setVisible(true);
+                        search.setVisible(false);
 
 
 
@@ -150,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         mSingleton.disconnect();
                         shutdown.setVisible(false);
-
+                        search.setVisible(true);
                         Snackbar.make(getWindow().getDecorView(), getText(R.string.disconnected),
                                 Snackbar.LENGTH_LONG).show();
                         //Correm el codi que controla la xarxa en un fil separat
@@ -216,10 +221,50 @@ public class MainActivity extends AppCompatActivity {
                 //Iniciem acivitat de configuració
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
+                break;
+
+            case R.id.action_search:
+                //Context for running on ui thread
+                Context context = this;
+                //We create the progress dialog
+                ProgressDialog progress = new ProgressDialog(this);
+                progress.setTitle(R.string.title_in_search);
+                progress.setMessage(getText(R.string.in_search));
+                progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                progress.setMax(255);
+                progress.setCancelable(false);
+                //Create confirmation dialog for starting search
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+                                //We start the search
+                                mSingleton.searchAddress(progress, context, 0);
+                                progress.show();
+
+                                break;
+
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                //No button clicked
+                                break;
+                        }
+
+
+                    }
+                };
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage(getText(R.string.confirm_search)).setPositiveButton(getText(R.string.yes), dialogClickListener)
+                        .setNegativeButton(getText(R.string.no), dialogClickListener).show();
+
+
+                break;
 
             default:
                 return super.onOptionsItemSelected(item);
         }
+        return true;
     }
 
 

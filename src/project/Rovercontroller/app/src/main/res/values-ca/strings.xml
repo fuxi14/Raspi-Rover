@@ -59,4 +59,8 @@
     <string name="title_IP_preference">Adreça IP robot</string>
     <string name="error_generic">Alguna cosa ha fallat</string>
     <string name="text_joystick_not_enabled">Joystick no habilitat: No hi ha connexió o el mode sense connexió està deshabilitat</string>
+    <string name="action_search">Buscar</string>
+    <string name="confirm_search">Vols començar a buscar l\'adreça IP del robot?</string>
+    <string name="in_search">Això pot trigar una mica...</string>
+    <string name="title_in_search">Buscant</string>
 </resources>

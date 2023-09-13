@@ -63,4 +63,9 @@ public class HomeFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
     }
+
+    public static void setEnterIP(String IpAddr) {
+        enterIP.setText(IpAddr);
+    }
+
 }
