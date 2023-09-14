@@ -224,24 +224,30 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case R.id.action_search:
-                //Context for running on ui thread
-                Context context = this;
                 //We create the progress dialog
+
                 ProgressDialog progress = new ProgressDialog(this);
                 progress.setTitle(R.string.title_in_search);
                 progress.setMessage(getText(R.string.in_search));
                 progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
                 progress.setMax(255);
                 progress.setCancelable(false);
+                progress.show();
                 //Create confirmation dialog for starting search
+                mSingleton.searchAddress();
+
+                //Deprecated
+                /*
+                AlertDialog.Builder builder;
                 DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which){
                             case DialogInterface.BUTTON_POSITIVE:
                                 //We start the search
-                                mSingleton.searchAddress(progress, context, 0);
-                                progress.show();
+
+                                mSingleton.searchAddress(mainThread);
+                                //progress.show();
 
                                 break;
 
@@ -254,9 +260,9 @@ public class MainActivity extends AppCompatActivity {
                     }
                 };
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                 builder = new AlertDialog.Builder(this);
                 builder.setMessage(getText(R.string.confirm_search)).setPositiveButton(getText(R.string.yes), dialogClickListener)
-                        .setNegativeButton(getText(R.string.no), dialogClickListener).show();
+                        .setNegativeButton(getText(R.string.no), dialogClickListener).show(); */
 
 
                 break;
