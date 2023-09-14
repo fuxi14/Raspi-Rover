@@ -11,6 +11,8 @@ import java.io.ObjectOutputStream;
 import java.lang.ClassNotFoundException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import server.DiscoveryServer.DiscoveryServer;
+
 /**
  * Aquesta classe fa de servidor,
  * Font: https://www.digitalocean.com/community/tutorials/java-socket-programming-server-client
@@ -27,12 +29,19 @@ public class Server {
     private static int port = 9876;
     private static boolean working = true;
     private static String message = "";
+    private static boolean discoverOn = true;
     
+    public static boolean isDiscoverOn() {return discoverOn;}
     
     
     
     public void run() throws IOException, ClassNotFoundException, EOFException{
         try {
+            //Iniciem el server per poder descobrir el server
+            new Thread(() -> {
+                DiscoveryServer.main();
+            }).start();
+            
             //Creem objecte server
             service = new ServerSocket(port);
             //Si el procés es mor a causa de que el client es desconecta, el podem tornar a cridar
@@ -63,14 +72,16 @@ public class Server {
                 }
             }
             System.out.println("[Server] Goodbye!");
+            discoverOn = false;
             
-        }
-        
-        catch (EOFException e) {
+        } catch (EOFException e) {
             Resource.canRetry = true;
             System.out.println("[Server] Connection with client was lost, restarting server...");
-        }
-        finally {
+        } catch(Exception e)  {
+            Resource.canRetry = true;
+            e.printStackTrace();
+            System.out.println("[Server] Unkwown error, restarting server...");
+        } finally {
             //Tanquem recursos
             oos.close();
             ois.close();

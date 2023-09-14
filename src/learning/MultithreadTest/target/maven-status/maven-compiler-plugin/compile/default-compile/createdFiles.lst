@@ -1,5 +1,8 @@
-local/mahouse/multithreadtest/Client.class
-local/mahouse/multithreadtest/Server.class
+server/DiscoveryServer/DiscoveryConfig.class
 local/mahouse/multithreadtest/MultithreadTest.class
-local/mahouse/multithreadtest/Reader.class
 local/mahouse/multithreadtest/Resource.class
+local/mahouse/multithreadtest/Client.class
+server/DiscoveryServer/DiscoveryServer.class
+server/DiscoveryServer/NetworkUtil.class
+local/mahouse/multithreadtest/Server.class
+local/mahouse/multithreadtest/Reader.class

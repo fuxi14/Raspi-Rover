@@ -29,6 +29,7 @@ import local.mahouse.rovercontroller.ui.home.HomeFragment;
 
 public class Singleton {
 
+    //Welcome to the mess that it is my code!
     private static InetAddress host;
     private static Socket socket;
     private static ObjectOutputStream oos = null;
@@ -40,14 +41,16 @@ public class Singleton {
     private static String mAddr;
     public static String mMessage;
     static Exception statConnect = null;
-
     private static int[] recievedData = new int[4]; //Data that we recieve from the server
-
     static Object lock = new Object(); //Use to notify the main thread to continue
-
     //Per poder trobar l'adreça
-    static volatile boolean searching;
+    volatile static boolean searching;
+    volatile static boolean hold = false;
     static volatile String foundAddress = "NONE";
+    static volatile boolean foundIt = false;
+    volatile static int[] checkServer = new int[] {128, 3, 4, 5}; //The packet that we send top the server to check response
+    volatile static int[] robotFoundRespone = new int[] {5, 4, 3, 128}; //The packet that we have to recieve to know it is the server
+
 
     //Creem un fil que connecta amb el server i escolta missatges que vénen del servidor
     public static final Runnable listener = new Runnable() {
@@ -283,7 +286,16 @@ public class Singleton {
         int i = startAddr;
         String iIPv4;
         while(searching && i <= endAddr) {
+            if (hold == true) { //We need to hold because another found something
+                System.out.println("Something found, holding");
+                while (hold) {}
+                if (!searching) { //If the thread found the server, the other threads stop
+                    break;
+                }
+                System.out.println("Resuming");
+            }
             iIPv4 = "192.168.1." + i;
+
             System.out.println("TESTING: " + iIPv4);
 
             try {
@@ -299,45 +311,48 @@ public class Singleton {
                     Socket socket = new Socket();
                     SocketAddress address = new InetSocketAddress(ip, 9876);
                     socket.connect(address, timeout);
-                    System.out.println(iIPv4 + " has a ServerSocket running...");
-                    foundAddress = iIPv4;
-                    searching = false; //Will be removed when checking is implemented
+                    System.out.println(iIPv4 + " has a ServerSocket running. Now testing for robot...");
+                    socket.setSoTimeout(5000); //Timeout for ObjectInputStream
+                    hold = true; //Hold the other threads
+                    ois = new ObjectInputStream(socket.getInputStream());
+                    oos = new ObjectOutputStream(socket.getOutputStream());
 
-                    //ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
-                    //ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-
-                    //We still can't use thi
                     //TODO: Implement server checking here and on Raspberry software
-                /*
+
                 //This is the packet that we sent to check whether we are talking to the robot or not
-                oos.writeObject(new int[] {128, 3, 4, 5});
 
-                try {
-                    recievedData = (int[]) ois.readObject();
-                } catch (ClassNotFoundException e) {
-                    System.out.println(iIPv4 + " isn't what we are looking for...");
-                } */
+                    oos.writeObject(checkServer);
 
+                        try {
+                            recievedData = (int[]) ois.readObject();
+                            if (recievedData == robotFoundRespone) {
+                                //We found the server! Now we need to connect to it
+                                searching = false;
+                                hold = false;
+                                final String theChosenOne = iIPv4;
+                                Activity activity = (Activity) context;
+                                activity.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        HomeFragment.setEnterIP(theChosenOne); //We set the found IP
+                                        progress.dismiss();
 
-                    System.out.println("We get to where we close the thread");
+                                        //TODO: Send notification when is done searching
+                                        //TODO: Automatically save found IP to settings
+                                    }
+                                });
 
-                    final String theChosenOne = iIPv4;
-                    Activity activity = (Activity) context;
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            HomeFragment.setEnterIP(theChosenOne); //We set the found IP
-                            progress.dismiss();
-                            //TODO: Send notification when is done searching
-                            //TODO: Automatically save found IP to settings
+                            } else {
+                                System.out.println("This is now the server we are searching for, continuing search...");
+                                hold = false;
+                            }
+                        } catch (ClassNotFoundException e) {
+                            System.out.println(iIPv4 + " isn't what we are looking for...");
                         }
-                    });
-
-
-
-                    socket.close();
-                    //in.close();
-                    //out.close();
+                        System.out.println("We get to where we close the thread");
+                        socket.close();
+                        ois.close();
+                        oos.close();
                 }
 
 
@@ -372,7 +387,7 @@ public class Singleton {
         Thread t3 = new Thread(new Runnable() {
             @Override
             public void run() {
-                Singleton.searchThread(progress, context, 129, 194, 1000);
+                Singleton.searchThread(progress, context, 160, 194, 1000);
             }
         });
         Thread t4 = new Thread(new Runnable() {
@@ -382,10 +397,10 @@ public class Singleton {
             }
         });
 
-        t1.start();
-        t2.start();
+        //t1.start();
+        //t2.start();
         t3.start();
-        t4.start();
+        //t4.start();
 
     }
 
