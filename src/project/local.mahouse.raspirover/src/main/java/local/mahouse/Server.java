@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  */
 
 
-public class Server extends Thread{
+public class Server {
     //Necessari per crear el fil
     private Thread t;
     private String threadName;
@@ -56,39 +56,13 @@ public class Server extends Thread{
     */
     private int[] data;
     private int[] sendData = new int[4];
-   
     
-    Server(String name) {
-        threadName = name;
-        console.println("Server thread created", this);
-    }
     
-    @Override
-    public void run() {
-        while(canRetry) {
-            canRetry = false;
+    public Runnable on = new Runnable() {
+        @Override
+        public void run() {
             try {
-                this.on();
-           } catch (IOException ex) { //OK Houston we've had a problem here
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ClassNotFoundException ex) {
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-
-            }
-        }
-    }
-    
-    @Override
-    public void start() {
-        console.println("Started server thread", this);
-        if(t == null) {//Comprovem si s'ha inicialitzat el fil i (si no) l'iniciem
-            t = new Thread(this, threadName);
-            t.start();
-        }
-    }
-    
-    public void on() throws IOException, ClassNotFoundException{
-        try {
+            console.println("Started server thread", this);
             //Creem objecte server
             service = new ServerSocket(port);
             //Si el procés es mor a causa de que el client es desconecta, el podem tornar a cridar
@@ -197,20 +171,31 @@ public class Server extends Thread{
             }*/
             console.println("Goodbye!", this);
             
-        }
-        
-        catch (EOFException e) {
-            canRetry = true;
-            console.println("Connection with client was lost, restarting server...", this);
-        }
-        finally {
+            } catch (EOFException e) {
+                canRetry = true;
+                console.println("Connection with client was lost, restarting server...", this);
+            } catch (IOException ex) { //OK Houston we've had a problem here
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+
+            } finally {
             //Tanquem recursos
-            oos.close();
-            ois.close();
-            socket.close();
-            service.close();
-            console.println("Socket and ServerSocked closed");
+                try {
+                    oos.close();
+                    ois.close();
+                    socket.close();
+                    service.close();
+                    console.println("Socket and ServerSocked closed");
+                } catch (IOException ex) {
+                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
         }
+    };
+    
+    public Runnable getRunnable() {
+        return on;
     }
     
 }

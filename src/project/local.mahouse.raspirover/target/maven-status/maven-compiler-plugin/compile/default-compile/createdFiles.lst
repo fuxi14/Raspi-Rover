@@ -1,6 +1,12 @@
-local/mahouse/Server.class
-module-info.class
 local/mahouse/Input.class
 local/mahouse/Main.class
+server/DiscoveryServer/DiscoveryServer.class
+local/mahouse/Main$2.class
 local/mahouse/Main$1Movement.class
 local/mahouse/Resource.class
+local/mahouse/Server.class
+server/DiscoveryServer/DiscoveryConfig.class
+module-info.class
+local/mahouse/Main$1.class
+local/mahouse/Server$1.class
+server/DiscoveryServer/NetworkUtil.class

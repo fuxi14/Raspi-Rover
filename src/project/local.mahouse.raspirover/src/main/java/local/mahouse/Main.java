@@ -19,7 +19,11 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
+import server.DiscoveryServer.DiscoveryServer;
 /**
  *
  * @author luca (base), Marcel
@@ -34,7 +38,13 @@ public class Main {
     private static final int m3 = 6; // PIN 31 = BCM 6
     private static final int m4 = 13; // PIN 33 = BCM 13
     private static final int PWMB = 12; // PIN 32 = BCM 12
-    
+    ExecutorService executorService = Executors.newFixedThreadPool(2);
+    Executor exe = new Executor() {
+        @Override
+        public void execute(Runnable runnable) {
+            executorService.execute(runnable);
+        }
+    };
     
     
     private static final Console console = new Console();
@@ -45,15 +55,9 @@ public class Main {
     public static void main(String[] args) throws Exception {
         console.title("Test program", "For learning Pi4J");
         Context pi4j = null;
-        /*float tim;
-        //Comprovem si s'ha donat algun argument
-        if(args.length == 0 || "0".equals(args[0])){
-            console.println("Nothing or 0 introduced, defaulting to x1");
-            tim = 1;
-        }else{
-            console.println("Value introduced, timer augmented by a factor of " + args[0]);
-            tim = Float.parseFloat(args[0]);
-        }*/
+        
+        //Per fer execució multifil
+        
         
         try {
             pi4j = Pi4J.newAutoContext();
@@ -212,8 +216,14 @@ public class Main {
         
         console.println("Opening server...");
         //Obrim server
-        Server server = new Server("Server");
-        server.start();
+        Server server = new Server();
+        exe.execute(server.getRunnable());
+        exe.execute(new Runnable() {
+            @Override
+            public void run() {
+                DiscoveryServer.main();
+            }
+        });
             
         /*
         //DEPRECATED    
