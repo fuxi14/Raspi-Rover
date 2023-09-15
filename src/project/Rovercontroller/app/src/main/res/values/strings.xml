@@ -65,4 +65,9 @@
     <string name="confirm_search">Do you want to start searching for the robot IP Address?</string>
     <string name="in_search">This may take a while...</string>
     <string name="title_in_search">Searching</string>
+    <string name="text_success_notification">An address was succesfully found!</string>
+    <string name="title_notification">Results from address search</string>
+    <string name="text_failure_notification">No suitable address found...</string>
+    <string name="channel_name">Rover controller</string>
+    <string name="channel_description">Notifications to inform about address discovery</string>
 </resources>

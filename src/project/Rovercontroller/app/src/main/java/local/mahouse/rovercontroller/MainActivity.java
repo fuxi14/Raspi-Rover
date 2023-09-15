@@ -1,15 +1,24 @@
 package local.mahouse.rovercontroller;
 
+import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -50,14 +59,20 @@ public class MainActivity extends AppCompatActivity {
     }
     private AppBarConfiguration mAppBarConfiguration;
 
+    //For getting notifications on Android 13 and higher
+    final int PERMISSION_REQUEST_CODE = 112;
+
     //Inicialitzem el Singleton
     Singleton mSingleton = Singleton.getInstance();
-
     //Used for setting it's visibility
     MenuItem shutdown;
     MenuItem search;
     //Used for setting it's text from the shutdown button
     MenuItem conDis;
+
+    NotificationManagerCompat notifyManCompat;
+    NotificationCompat.Builder notiBuild;
+
     //We create a new ExecutorService
     ExecutorService executorService = Executors.newFixedThreadPool(4);
     Executor executor = new Executor() {
@@ -71,6 +86,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main); //M'ho havia deixat, F
+        createNotificationChannel();
+        getNotificationPermission();
+        notifyManCompat = NotificationManagerCompat.from(this);
+        notiBuild = new NotificationCompat.Builder(this, "ROVER_CONTROLLER_NOTIFICATIONS");
+        notiBuild.setSmallIcon(R.drawable.baseline_android_24);
+
+        //Send notification
+        //notifyManCompat.notify(0, notiBuild.build());
 
 
         //Inicialitzem la barra d'eines i el botó flotant
@@ -243,23 +266,37 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_search:
                 String address;
                 ProgressDialog progress = new ProgressDialog(this);
+                Context forWrite = this;
+
                 Callback callback = new Callback() {
                     @Override
                     public void onComplete(String result) {
                         progress.dismiss();
+
+
 
                         //All this to update the IP address
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 HomeFragment.setEnterIP(result);
+                                notiBuild.setContentTitle(getText(R.string.title_notification))
+                                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                                        .setContentIntent(null)
+                                        .setAutoCancel(true);
+                                if(result != "") {
+                                    notiBuild.setContentText(getText(R.string.text_success_notification));
+                                    mSingleton.writeToPreference(forWrite, "robot_ip_address", result);
+                                } else {
+                                    notiBuild.setContentText(getText(R.string.text_failure_notification));
+                                }
+                                notifyManCompat.notify(0, notiBuild.build());
                             }
                         });
                     }
                 };
 
                 //We create the progress dialog
-
                 progress.setTitle(R.string.title_in_search);
                 progress.setMessage(getText(R.string.in_search));
                 progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -311,6 +348,58 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+
+
+    //Creem el canal de notoficacions
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is not in the Support Library.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.channel_name);
+            String description = getString(R.string.channel_description);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel("ROVER_CONTROLLER_NOTIFICATIONS", name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system. You can't change the importance
+            // or other notification behaviors after this.
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    //From https://stackoverflow.com/a/75354948
+    public void getNotificationPermission(){
+        try {
+            if (Build.VERSION.SDK_INT > 32) {
+                System.out.println("Running on Android 13 or higher");
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                        PERMISSION_REQUEST_CODE);
+            }
+        }catch (Exception e){
+
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+            case PERMISSION_REQUEST_CODE:
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 &&
+                        grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // allow
+
+                }  else {
+                    //deny
+                }
+                return;
+
+        }
+
+    }
 
 
 }

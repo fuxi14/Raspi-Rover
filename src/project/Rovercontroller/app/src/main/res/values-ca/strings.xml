@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Comandament del Ròver</string>
+    <string name="app_name">Comandament del ròver</string>
     <string name="navigation_drawer_open">Obrir menú de navegació</string>
     <string name="navigation_drawer_close">Tancar menú de navegació</string>
     <string name="nav_header_title">Control·lador del robot</string>
@@ -63,4 +63,9 @@
     <string name="confirm_search">Vols començar a buscar l\'adreça IP del robot?</string>
     <string name="in_search">Això pot trigar una mica...</string>
     <string name="title_in_search">Buscant</string>
+    <string name="text_success_notification">S\'ha trobat una adreça!</string>
+    <string name="title_notification">Resultat de la cerca de l\'adreça</string>
+    <string name="text_failure_notification">No s\'ha trobat cap adreça...</string>
+    <string name="channel_name">Comandament del ròver</string>
+    <string name="channel_description">Notificacions per informar sobre el descobriment d\'adreces</string>
 </resources>
