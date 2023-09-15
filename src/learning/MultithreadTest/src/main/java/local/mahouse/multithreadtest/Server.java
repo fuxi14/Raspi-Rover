@@ -29,7 +29,7 @@ public class Server {
     private static int port = 9876;
     private static boolean working = true;
     private static String message = "";
-    private static boolean discoverOn = true;
+    private static boolean discoverOn = false;
     
     public static boolean isDiscoverOn() {return discoverOn;}
     
@@ -38,9 +38,13 @@ public class Server {
     public void run() throws IOException, ClassNotFoundException, EOFException{
         try {
             //Iniciem el server per poder descobrir el server
-            new Thread(() -> {
-                DiscoveryServer.main();
-            }).start();
+            if (!discoverOn) {
+                discoverOn = true;
+                
+                new Thread(() -> {
+                    DiscoveryServer.main();
+                }).start();
+            }
             
             //Creem objecte server
             service = new ServerSocket(port);
