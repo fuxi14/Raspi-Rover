@@ -3,7 +3,8 @@
     <string name="app_name">Comandament del Ròver</string>
     <string name="navigation_drawer_open">Obrir menú de navegació</string>
     <string name="navigation_drawer_close">Tancar menú de navegació</string>
-    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_title">Control·lador del robot</string>
+    <string name="nav_header_title">Control·lador del robot</string>
     <string name="nav_header_desc">Capçalera de navegació</string>
     <string name="action_settings">Configuració</string>
     <string name="menu_home">Inici</string>

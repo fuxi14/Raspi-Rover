@@ -24,9 +24,9 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-
-import local.mahouse.rovercontroller.discover.client.DiscoveryClient;
-import local.mahouse.rovercontroller.ui.home.HomeFragment;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Singleton {
 
@@ -44,6 +44,10 @@ public class Singleton {
     static Exception statConnect = null;
     private static int[] recievedData = new int[4]; //Data that we recieve from the server
     static Object lock = new Object(); //Use to notify the main thread to continue
+
+
+
+    //Aquí hi han els "Runnables" per fer servir amb ExecutorService
 
     //Creem un fil que connecta amb el server i escolta missatges que vénen del servidor
     public static final Runnable listener = new Runnable() {
@@ -80,7 +84,7 @@ public class Singleton {
             }
 
             //Escolta
-            while(true) {
+            while(isConnected()) {
                 try {
 
                     //We read the data
@@ -120,6 +124,8 @@ public class Singleton {
             }
         }
     };
+
+
 
     private static final Singleton instance = new Singleton();
 
@@ -169,12 +175,14 @@ public class Singleton {
     //-------------------------- END OF GETTERS AND SETTERS -------------------------------
 
 
-    public Exception connect(String addr) {
+    public Exception connect(String addr, Executor exe) {
 
         mAddr = addr;
-
         //Start listener thread
-        new Thread(listener, "listener").start();
+        //new Thread(listener, "listener").start(); //DEPRECTED
+
+
+        exe.execute(listener);
 
         synchronized (lock) {
             try {
@@ -188,6 +196,9 @@ public class Singleton {
 
 
     }
+
+
+
     public static void disconnect() throws IOException {
         if (oos != null && ois != null && socket != null) { //No fem res si no s'han inicialitzat
             oos.close();
@@ -197,6 +208,8 @@ public class Singleton {
         }
         connected = false;
     }
+
+
 
     //We send a STRING message
     public static boolean sendIt(String message) {
@@ -238,6 +251,8 @@ public class Singleton {
         return false;
     }
 
+
+
     //Send BYTE ARRAY to server
     public static boolean sendIt(int[] data) {
         if(isConnected()) {
@@ -273,11 +288,6 @@ public class Singleton {
         return false;
     }
 
-    public void searchAddress() {
-        //Thanks to very kind people in Github, this is now much easier and reliable
-        HomeFragment.setEnterIP(DiscoveryClient.main());
-
-    }
 
 
     //Per guardar i aplicar configuració guardada
@@ -296,6 +306,8 @@ public class Singleton {
         }
     }
 
+
+
     public boolean getBooleanPreferenceValue(Context context, String preferance)
     {
         boolean data = false;
@@ -310,6 +322,7 @@ public class Singleton {
             return data;
         }
     }
+
 
 
     public void writeToPreference(Context context, String preferance, String thePreference)

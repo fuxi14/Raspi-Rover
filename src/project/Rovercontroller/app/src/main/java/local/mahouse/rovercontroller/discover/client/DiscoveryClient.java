@@ -108,7 +108,7 @@ public class DiscoveryClient implements Callable<String> {
 	 */
 	public String call() {
 
-		new Thread(() -> {
+		//new Thread(() -> {
 			synchronized (lock) {
 				// Packet for receiving response from server
 				byte[] receiveBuffer = new byte[MAX_PACKET_SIZE];
@@ -157,20 +157,20 @@ public class DiscoveryClient implements Callable<String> {
 					} catch (IOException ioe) {
 						logger.log(Level.SEVERE, "IOException during socket operation ", ioe);
 						break;
-					} finally {
+					} /*finally {
 						lock.notify();
-					}
+					}*/
 				}
 			}
-		}).start();
+		//}).start();
 
-		synchronized (lock) {
+		/*synchronized (lock) {
 			try {
 				lock.wait();
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e);
 			}
-		}
+		}*/
 		logger.info("This should be the last");
 		// should close the socket before returning
 		if (socket != null) socket.close();

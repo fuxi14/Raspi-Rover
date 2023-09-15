@@ -31,15 +31,23 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import local.mahouse.rovercontroller.ui.home.HomeFragment;
+import local.mahouse.rovercontroller.discover.client.DiscoveryClient;
+
+
 
 
 public class MainActivity extends AppCompatActivity {
-
+    static interface Callback {
+        void onComplete(String result);
+    }
     private AppBarConfiguration mAppBarConfiguration;
 
     //Inicialitzem el Singleton
@@ -50,6 +58,14 @@ public class MainActivity extends AppCompatActivity {
     MenuItem search;
     //Used for setting it's text from the shutdown button
     MenuItem conDis;
+    //We create a new ExecutorService
+    ExecutorService executorService = Executors.newFixedThreadPool(4);
+    Executor executor = new Executor() {
+        @Override
+        public void execute(Runnable runnable) {
+            executorService.execute(runnable);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,7 +132,8 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         //Provem de connectar
                         Exception su;
-                        su = mSingleton.connect(addr);
+
+                        su = mSingleton.connect(addr, executor);
                         if (su != null) { //Sortim si ha hagut un error
                             throw su;
                         }
@@ -224,17 +241,38 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case R.id.action_search:
+                String address;
+                ProgressDialog progress = new ProgressDialog(this);
+                Callback callback = new Callback() {
+                    @Override
+                    public void onComplete(String result) {
+                        progress.dismiss();
+
+                        //All this to update the IP address
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                HomeFragment.setEnterIP(result);
+                            }
+                        });
+                    }
+                };
+
                 //We create the progress dialog
 
-                ProgressDialog progress = new ProgressDialog(this);
                 progress.setTitle(R.string.title_in_search);
                 progress.setMessage(getText(R.string.in_search));
-                progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                 progress.setMax(255);
                 progress.setCancelable(false);
                 progress.show();
-                //Create confirmation dialog for starting search
-                mSingleton.searchAddress();
+
+                executor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.onComplete(DiscoveryClient.main());
+                    }
+                });
 
                 //Deprecated
                 /*
