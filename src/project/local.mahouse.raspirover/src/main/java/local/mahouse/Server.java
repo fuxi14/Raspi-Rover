@@ -14,6 +14,7 @@ import java.net.Socket;
 import com.pi4j.util.Console;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import server.DiscoveryServer.DiscoveryServer;
 /**
  * Aquesta classe fa de servidor,
  * Font: https://www.digitalocean.com/community/tutorials/java-socket-programming-server-client
@@ -61,134 +62,137 @@ public class Server {
     public Runnable on = new Runnable() {
         @Override
         public void run() {
-            try {
-            console.println("Started server thread", this);
-            //Creem objecte server
-            service = new ServerSocket(port);
-            //Si el procés es mor a causa de que el client es desconecta, el podem tornar a cridar
-
-            //Escoltem indefinidament mentre no rebi l'ordre de sortir
-            //Obrim una nova connecció amb l'objecte "socket" i esperem a que s'inicialitzi la connecció
-            console.println("Waiting for client on port " + Integer.toString(port) + "...", this);
-            
-            socket = service.accept();
-            console.println("Connection initialized, prociding to read sent info...", this);
-            ois = new ObjectInputStream(socket.getInputStream());
-            oos = new ObjectOutputStream(socket.getOutputStream());
-            while(working) {
-
-                console.println("Waiting for input...", this);
-                
-                //We clean and recieve new data array
-                //message = (String) ois.readObject();
-                data = (int[]) ois.readObject();
-                console.println("Data array recieved", this);
-                
-                //console.println(message, this);
-                //data = new Byte[4];
-                //data[0] = 0;
-                //Processem les dades rebudes
-                switch(data[0]) {
-                    case 0: //No fer res
-                        console.println("We don't do anything", this);
-                        break;
-                    case 1: //Moure manualment
-                        //Processem les dades per moure manualment
-                        switch(data[1]) {
-                            case 0:
-                                Resource.word = "stop";
-                                sendData[0] = 4;
-                                sendData[1] = 0;
-                                break;
-                            case 1:
-                                Resource.word = "forward";
-                                sendData[0] = 4;
-                                sendData[1] = 1;
-                                break;
-                            case 2:
-                                Resource.word = "reverse";
-                                sendData[0] = 4;
-                                sendData[1] = 2;
-                                break;
-                            case 3:
-                                Resource.word = "left";
-                                sendData[0] = 4;
-                                sendData[1] = 3;
-                                break;
-                            case 4:
-                                Resource.word = "right";
-                                sendData[0] = 4;
-                                sendData[1] = 4;
-                                break;
-                            default:
-                                sendData[0] = 4;
-                                sendData[1] = 128;
-                                console.println("WARNING: Movement option not reconized, not changing anything", this);
-                                break;
-                        }
-                        //Enviem resposta
-                        //Encara no, però
-                      /*oos.writeObject(sendData);
-                        oos.reset(); */
-                        
-                        //TODO: Processar dades de velocitat 
-                        Resource.speedLeft = data[2];
-                        Resource.speedRight = data[3];
-                        
-                        break;
-                        
-                    //Rebuda petició per apagar
-                    case 255:
-                        console.println("Off signal recieved, turning off system...");
-                        Resource.word = "quit";
-                        working = false;
-                        break;
-                    default:
-                        console.println("WARNING: Verb not reconized, not doing anything", this);
-                        break;
-                        
-                }
-                data = null;
-            }
-                
-                /*
-                //For now, this is no longer in use
-                console.println("Message recieved: " + message, this);
-                console.println("Responding to client... ", this);
-                //Responem al client:
-
-                oos.writeObject("Hi Client! Message recieved was: " + message);
-
-                //Tancar si és necessari
-                if(message.equalsIgnoreCase("exit") || message.equalsIgnoreCase("quit")) {
-                    console.println("Client requested closing of the server...", this);
-                    working = false;
-                    Resource.word = "quit";
-
-                } else {
-                    Resource.word = message;
-                }
-            }*/
-            console.println("Goodbye!", this);
-            
-            } catch (EOFException e) {
-                canRetry = true;
-                console.println("Connection with client was lost, restarting server...", this);
-            } catch (IOException ex) { //OK Houston we've had a problem here
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ClassNotFoundException ex) {
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-
-            } finally {
-            //Tanquem recursos
+            while(canRetry) {
+                canRetry = false;
                 try {
-                    oos.close();
-                    ois.close();
-                    socket.close();
-                    service.close();
-                    console.println("Socket and ServerSocked closed");
-                } catch (IOException ex) {
-                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                console.println("Started server thread", this);
+                //Creem objecte server
+                service = new ServerSocket(port);
+                //Si el procés es mor a causa de que el client es desconecta, el podem tornar a cridar
+
+                //Escoltem indefinidament mentre no rebi l'ordre de sortir
+                //Obrim una nova connecció amb l'objecte "socket" i esperem a que s'inicialitzi la connecció
+                console.println("Waiting for client on port " + Integer.toString(port) + "...", this);
+
+                socket = service.accept();
+                console.println("Connection initialized, prociding to read sent info...", this);
+                ois = new ObjectInputStream(socket.getInputStream());
+                oos = new ObjectOutputStream(socket.getOutputStream());
+                while(working) {
+
+                    console.println("Waiting for input...", this);
+
+                    //We clean and recieve new data array
+                    //message = (String) ois.readObject();
+                    data = (int[]) ois.readObject();
+                    console.println("Data array recieved", this);
+
+                    //console.println(message, this);
+                    //data = new Byte[4];
+                    //data[0] = 0;
+                    //Processem les dades rebudes
+                    switch(data[0]) {
+                        case 0: //No fer res
+                            console.println("We don't do anything", this);
+                            break;
+                        case 1: //Moure manualment
+                            //Processem les dades per moure manualment
+                            switch(data[1]) {
+                                case 0:
+                                    Resource.word = "stop";
+                                    sendData[0] = 4;
+                                    sendData[1] = 0;
+                                    break;
+                                case 1:
+                                    Resource.word = "forward";
+                                    sendData[0] = 4;
+                                    sendData[1] = 1;
+                                    break;
+                                case 2:
+                                    Resource.word = "reverse";
+                                    sendData[0] = 4;
+                                    sendData[1] = 2;
+                                    break;
+                                case 3:
+                                    Resource.word = "left";
+                                    sendData[0] = 4;
+                                    sendData[1] = 3;
+                                    break;
+                                case 4:
+                                    Resource.word = "right";
+                                    sendData[0] = 4;
+                                    sendData[1] = 4;
+                                    break;
+                                default:
+                                    sendData[0] = 4;
+                                    sendData[1] = 128;
+                                    console.println("WARNING: Movement option not reconized, not changing anything", this);
+                                    break;
+                            }
+                            //Enviem resposta
+                            //Encara no, però
+                          /*oos.writeObject(sendData);
+                            oos.reset(); */
+
+                            //TODO: Processar dades de velocitat 
+                            Resource.speedLeft = data[2];
+                            Resource.speedRight = data[3];
+
+                            break;
+
+                        //Rebuda petició per apagar
+                        case 255:
+                            console.println("Off signal recieved, turning off system...");
+                            Resource.word = "quit";
+                            working = false;
+                            break;
+                        default:
+                            console.println("WARNING: Verb not reconized, not doing anything", this);
+                            break;
+
+                    }
+                    data = null;
+                }
+
+                    /*
+                    //For now, this is no longer in use
+                    console.println("Message recieved: " + message, this);
+                    console.println("Responding to client... ", this);
+                    //Responem al client:
+
+                    oos.writeObject("Hi Client! Message recieved was: " + message);
+
+                    //Tancar si és necessari
+                    if(message.equalsIgnoreCase("exit") || message.equalsIgnoreCase("quit")) {
+                        console.println("Client requested closing of the server...", this);
+                        working = false;
+                        Resource.word = "quit";
+
+                    } else {
+                        Resource.word = message;
+                    }
+                }*/
+                console.println("Goodbye!", this);
+
+                } catch (EOFException e) {
+                    canRetry = true;
+                    console.println("Connection with client was lost, restarting server...", this);
+                } catch (IOException ex) { //OK Houston we've had a problem here
+                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+
+                } finally {
+                //Tanquem recursos
+                    try {
+                        oos.close();
+                        ois.close();
+                        socket.close();
+                        service.close();
+                        console.println("Socket and ServerSocked closed");
+                    } catch (IOException ex) {
+                        Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
         }

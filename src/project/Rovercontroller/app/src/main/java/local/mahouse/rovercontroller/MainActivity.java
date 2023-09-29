@@ -232,6 +232,7 @@ public class MainActivity extends AppCompatActivity {
                                     try {
                                         mSingleton.disconnect();
                                         shutdown.setVisible(false);
+                                        search.setVisible(true);
                                         Snackbar.make(getWindow().getDecorView(), getText(R.string.disconnected),
                                                 Snackbar.LENGTH_LONG).show();
                                         //Correm el codi que controla la xarxa en un fil separat

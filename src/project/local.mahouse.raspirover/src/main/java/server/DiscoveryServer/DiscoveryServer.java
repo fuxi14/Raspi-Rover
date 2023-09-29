@@ -10,6 +10,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import local.mahouse.Resource;
 
 import static server.DiscoveryServer.DiscoveryConfig.*;
 
@@ -53,7 +54,7 @@ public class DiscoveryServer implements Runnable {
 	
 	public static void main() {
 		DiscoveryServer server = new DiscoveryServer();
-		server.run();
+                server.run();
 	}
 
 	@Override
@@ -133,6 +134,10 @@ public class DiscoveryServer implements Runnable {
 						clientAddress.getHostAddress(), clientPort) );
 			}
 		}
-	}	
+	}
+        
+        public void shutdown() {
+            socket.close();
+        }
 
 }

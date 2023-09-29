@@ -53,7 +53,8 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws Exception {
-        console.title("Test program", "For learning Pi4J");
+        console.title("Raspberry Pi Rover", "By fuxi14");
+        console.box("Made with Pi4J");
         Context pi4j = null;
         
         //Per fer execució multifil
@@ -214,16 +215,12 @@ public class Main {
         
         Movement move = new Movement();
         
+        DiscoveryServer discover = new DiscoveryServer();
         console.println("Opening server...");
         //Obrim server
         Server server = new Server();
         exe.execute(server.getRunnable());
-        exe.execute(new Runnable() {
-            @Override
-            public void run() {
-                DiscoveryServer.main();
-            }
-        });
+        executorService.submit(discover);
             
         /*
         //DEPRECATED    
@@ -268,6 +265,9 @@ public class Main {
             Resource.canExit = true;
             
         }
+        //Since DiscoveryServer doesn't want to shutdown on it's own, we obliterate it
+        discover.shutdown();
+        executorService.shutdownNow();
     }
     
     
